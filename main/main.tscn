@@ -45,9 +45,40 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer2"]
 layout_mode = 2
-text = "Acclerometer Magnitudes"
+text = "Padded Magnitudes"
 
-[node name="Chart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer2"]
+[node name="PaddedChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_7kppn")
+
+[node name="ChartContainer4" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer4"]
+layout_mode = 2
+text = "FFT Magnitudes"
+
+[node name="FFTChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_7kppn")
+
+[node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer3"]
+layout_mode = 2
+text = "Filtered Magnitudes"
+
+[node name="FilteredChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer3"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_7kppn")

@@ -17,7 +17,7 @@ func plot_line() -> void:
 	for i in range(1, len(y)):
 		var from: Vector2 = Vector2(fit(i - 1, 0, len(y) - 1, size.x), fit(y[i - 1], min_y, max_y, size.y))
 		var to: Vector2 = Vector2(fit(i, 0, len(y) - 1, size.x), fit(y[i], min_y, max_y, size.y))
-		draw_line(from, to, Color(0.5, 0.2, 0.9), 2.0, true)
+		draw_line(from, to, Color(0.5, 0.2, 0.9), 1.0, true)
 
 func fit(v: float, min_v: float, max_v: float, scalar: float) -> float:
 	return (v - min_v) / (max_v - min_v) * scalar

@@ -15,11 +15,21 @@ run/main_scene="res://main/main.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+FFT="*res://addons/godot-fft/Fft.gd"
+
 [display]
 
 window/size/viewport_width=600
 window/size/viewport_height=800
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
 window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-fft/plugin.cfg")
 
 [rendering]
 
