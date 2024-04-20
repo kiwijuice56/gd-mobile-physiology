@@ -3,55 +3,59 @@ extends Node
 
 signal sampling_complete
 
+
+var acclerometer_sample_x_raw: Array[float] 
+var acclerometer_sample_y_raw: Array[float] 
+var acclerometer_sample_z_raw: Array[float] 
+
 var acclerometer_sample_x: Array[float] 
 var acclerometer_sample_y: Array[float] 
 var acclerometer_sample_z: Array[float] 
 
-var sample_count: int 
+var sample_count: int = 512
+var frame_index: int = 0
 
-const FIR_coef: Array[float] = [
-	-0.030558025513308964,
-	-0.0444457674165741,
-	-0.02702148514505239,
-	0.04617464410595246,
-	0.1617586061668395,
-	0.2702328451984712,
-	0.31473643267885837,
-	0.2702328451984712,
-	0.1617586061668395,
-	0.04617464410595246,
-	-0.02702148514505239,
-	-0.0444457674165741,
-	-0.030558025513308964
-]
+func _physics_process(_delta: float) -> void:
+	var sample: Vector3 = Input.get_accelerometer()
+	
+	acclerometer_sample_x_raw.append(sample.x)
+	acclerometer_sample_y_raw.append(sample.y)
+	acclerometer_sample_z_raw.append(sample.z)
+	
+	if len(acclerometer_sample_x_raw) > sample_count:
+		acclerometer_sample_x_raw.pop_front()
+		acclerometer_sample_y_raw.pop_front()
+		acclerometer_sample_z_raw.pop_front()
+	
+	%RawDataX.initialize(acclerometer_sample_x_raw)
+	%RawDataY.initialize(acclerometer_sample_y_raw)
+	%RawDataZ.initialize(acclerometer_sample_z_raw)
 
-func _ready() -> void:
-	set_physics_process(false)
 	
-	# Delay to make it easier to measure data
-	await get_tree().create_timer(1.0).timeout
-	
-	await sample(512)
-	print("Samples collected.")
-	
-	%RawDataX.initialize(acclerometer_sample_x.duplicate())
-	%RawDataY.initialize(acclerometer_sample_y.duplicate())
-	%RawDataZ.initialize(acclerometer_sample_z.duplicate())
+	frame_index += 1
+	if frame_index % 64 == 0:
+		analyze_data()
+		frame_index = 0
+
+func analyze_data() -> void:
+	acclerometer_sample_x = acclerometer_sample_x_raw.duplicate()
+	acclerometer_sample_y = acclerometer_sample_y_raw.duplicate()
+	acclerometer_sample_z = acclerometer_sample_z_raw.duplicate()
 	
 	detrend_samples(15)
 	normalize_samples()
-	
 	%DetrendedDataX.initialize(acclerometer_sample_x.duplicate())
-	%DetrendedDataX.initialize(acclerometer_sample_y.duplicate())
-	%DetrendedDataX.initialize(acclerometer_sample_z.duplicate())
+	%DetrendedDataY.initialize(acclerometer_sample_y.duplicate())
+	%DetrendedDataZ.initialize(acclerometer_sample_z.duplicate())
 	
-	var result: Array = %ICA.analyze(acclerometer_sample_x, acclerometer_sample_y, acclerometer_sample_z, len(acclerometer_sample_x))
+	var ica_result: Array = %ICA.analyze(acclerometer_sample_x, acclerometer_sample_y, acclerometer_sample_z, len(acclerometer_sample_x))
 	var ica_signals: Array = []
 	
+	# Transpose the ICA signals
 	for si in range(3):
 		var output: Array = []
 		for i in range(len(acclerometer_sample_x)):
-			output.append(result[i][si])
+			output.append(ica_result[i][si])
 		ica_signals.append(output)
 	
 	%ICA1.initialize(ica_signals[0])
@@ -59,7 +63,6 @@ func _ready() -> void:
 	%ICA3.initialize(ica_signals[2])
 	
 	var ffts: Array = []
-	
 	for component in ica_signals:
 		ffts.append(get_fourier_transform(component))
 	
@@ -70,31 +73,6 @@ func _ready() -> void:
 	%HeartRateLabel1.text = "Heart Rate (bpm): " + str(extract_heartrate(ffts[0]))
 	%HeartRateLabel2.text = "Heart Rate (bpm): " + str(extract_heartrate(ffts[1]))
 	%HeartRateLabel3.text = "Heart Rate (bpm): " + str(extract_heartrate(ffts[2]))
-	
-	print("Done!")
-
-func _physics_process(_delta: float) -> void:
-	var sample: Vector3 = Input.get_accelerometer()
-	
-	if len(acclerometer_sample_x) < sample_count:
-		acclerometer_sample_x.append(sample.x)
-		acclerometer_sample_y.append(sample.y)
-		acclerometer_sample_z.append(sample.z)
-	else:
-		sampling_complete.emit()
-
-func sample(count: int):
-	sample_count = count
-	
-	acclerometer_sample_x = []
-	acclerometer_sample_y = []
-	acclerometer_sample_y = []
-	
-	set_physics_process(true)
-	
-	await sampling_complete
-	
-	set_physics_process(false)
 
 func detrend_samples(window_size: int) -> void:
 	for sample in [acclerometer_sample_x, acclerometer_sample_y, acclerometer_sample_z]:
@@ -128,11 +106,11 @@ func extract_heartrate(fft: Array[float]):
 	var max_amplitude: float = 0
 	for i in range(len(fft)):
 		var frequency: float = 60.0 / len(fft) * i
-		if 0.66 < frequency and frequency < 2.5:
+		if 1 < frequency and frequency < 2:
 			if fft[i] > max_amplitude:
 				max_amplitude = fft[i]
 				max_amplitude_frequency = frequency
-	print(max_amplitude_frequency, ": ", max_amplitude)
+
 	return max_amplitude_frequency * 60
 
 func get_fourier_transform(sample: Array) -> Array[float]:
