@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" path="res://main/HeartRateSensor.gd" id="1_nxemo"]
-[ext_resource type="Script" path="res://main/Chart.gd" id="2_7kppn"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart.tscn" id="2_qtway"]
 
 [node name="Main" type="Node"]
 
@@ -14,7 +14,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 16
+theme_override_constants/margin_left = 128
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
@@ -30,28 +30,11 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer"]
 layout_mode = 2
-text = "Acclerometer Magnitudes"
+text = "Raw Data (x)"
 
-[node name="MagnitudesChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer"]
+[node name="RawData" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("2_7kppn")
-
-[node name="ChartContainer2" type="VBoxContainer" parent="MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer2"]
-layout_mode = 2
-text = "Padded Magnitudes"
-
-[node name="PaddedChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("2_7kppn")
 
 [node name="ChartContainer4" type="VBoxContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -60,13 +43,12 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
-text = "FFT Magnitudes"
+text = "Detrended Data (x)"
 
-[node name="FFTChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer4"]
+[node name="DetrendedData" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("2_7kppn")
+line_color = Color(0.619608, 0.286275, 0.501961, 1)
 
 [node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -75,10 +57,16 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer3"]
 layout_mode = 2
-text = "Filtered Magnitudes"
+text = "Normalized Data (x)"
 
-[node name="FilteredChart" type="PanelContainer" parent="MarginContainer/GridContainer/ChartContainer3"]
+[node name="NormalizedData" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("2_7kppn")
+line_color = Color(0.564706, 0.356863, 0.372549, 1)
+
+[node name="HeartRateLabel" type="Label" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+text = "Heart Rate: 0 bpm"

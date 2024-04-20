@@ -21,11 +21,10 @@ FFT="*res://addons/godot-fft/Fft.gd"
 
 [display]
 
-window/size/viewport_width=600
-window/size/viewport_height=800
+window/size/viewport_width=1800
+window/size/viewport_height=1200
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep_width"
-window/handheld/orientation=1
+window/stretch/aspect="keep_height"
 
 [editor_plugins]
 

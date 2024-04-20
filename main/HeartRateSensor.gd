@@ -1,6 +1,8 @@
 class_name HeartRateSensor
 extends Node
 
+signal sampling_complete
+
 var acclerometer_sample_x: Array[float] 
 var acclerometer_sample_y: Array[float] 
 var acclerometer_sample_z: Array[float] 
@@ -26,34 +28,73 @@ const FIR_coef: Array[float] = [
 func _ready() -> void:
 	set_physics_process(false)
 	
+	# Delay to make it easier to measure data
 	await get_tree().create_timer(1.0).timeout
 	
-	start_sampling()
-	await get_tree().create_timer(20.0).timeout
-	stop_sampling()
+	await sample(256)
+	%RawData.initialize(acclerometer_sample_x.duplicate())
 	
-	analyze_samples()
+	detrend_samples(15)
+	%DetrendedData.initialize(acclerometer_sample_x.duplicate())
+	
+	print("Done!")
 
 func _physics_process(_delta: float) -> void:
 	var sample: Vector3 = Input.get_accelerometer()
-	if len(acclerometer_sample_x) < 1024:
+	
+	if len(acclerometer_sample_x) < sample_count:
 		acclerometer_sample_x.append(sample.x)
 		acclerometer_sample_y.append(sample.y)
 		acclerometer_sample_z.append(sample.z)
+	else:
+		sampling_complete.emit()
+
+func sample(count: int):
+	sample_count = count
+	
+	acclerometer_sample_x = []
+	acclerometer_sample_y = []
+	acclerometer_sample_y = []
+	
+	set_physics_process(true)
+	
+	await sampling_complete
+	
+	set_physics_process(false)
+
+func detrend_samples(window_size: int) -> void:
+	for sample in [acclerometer_sample_x, acclerometer_sample_y, acclerometer_sample_z]:
+		var output: Array[float] = []
+		
+		# Average the first few values, since these will be out of bounds for the window
+		var initial_average: float = 0
+		for i in range(len(sample)):
+			initial_average += sample[i]
+		initial_average /= len(sample)
+		
+		var average: float = initial_average
+		for i in range(len(sample)):
+			if i - window_size < 0:
+				average -= initial_average / window_size
+			else:
+				average -= sample[i - window_size] / window_size
+			average += sample[i] / window_size
+			output.append(sample[i] - average)
+		
+		for i in range(len(output)):
+			sample[i] = output[i]
 
 func analyze_samples() -> void:
 	normalize_samples()
 	var magnitudes: Array[float] = flatten_samples()
 	%MagnitudesChart.initialize(magnitudes)
 	
-	var padded_magnitudes: Array[float] = pad_magnitudes(magnitudes)
-	%PaddedChart.initialize(padded_magnitudes)
+	#var padded_magnitudes: Array[float] = pad_magnitudes(magnitudes)
+	#%PaddedChart.initialize(padded_magnitudes)
 	
-	var median: float = get_mean(magnitudes)
+	var median: float = get_median(magnitudes)
 	for i in range(len(magnitudes)):
 		magnitudes[i] -= median
-	
-	print(get_mean(magnitudes))
 
 	# The FFT plugin expects an ambiguous array, as it modifies it with
 	# ComplexNumber objects in-place for performance reasons.
@@ -70,19 +111,7 @@ func analyze_samples() -> void:
 	var filtered_magnitudes: Array[float] = apply_fir_filter(fft_magnitudes)
 	%FilteredChart.initialize(filtered_magnitudes)
 	
-	#print(filtered_magnitudes)
-	print(extract_heartrate(filtered_magnitudes))
-
-func start_sampling() -> void:
-	set_physics_process(true)
-	sample_count = 0
-	acclerometer_sample_x = []
-	acclerometer_sample_y = []
-	acclerometer_sample_y = []
-
-func stop_sampling() -> void:
-	set_physics_process(false)
-	sample_count = len(acclerometer_sample_x)
+	%HeartRateLabel.text = "Heart Rate: " + str(extract_heartrate(filtered_magnitudes) * 60) + " bpm"
 
 func normalize_samples() -> void:
 	for axis in [acclerometer_sample_x, acclerometer_sample_y, acclerometer_sample_z]:
@@ -111,12 +140,6 @@ func get_median(array: Array[float]) -> float:
 	array = array.duplicate()
 	array.sort()
 	return array[int(len(array) / 2)]
-
-func get_mean(array: Array[float]) -> float:
-	var sum: float = 0
-	for x in array:
-		sum += x
-	return sum / len(array)
 
 func apply_fir_filter(magnitudes: Array[float]) -> Array[float]:
 	var buffer: Array[float] = []
