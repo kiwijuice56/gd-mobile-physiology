@@ -34,13 +34,19 @@ func _ready() -> void:
 	await sample(256)
 	print("Samples collected.")
 	
-	%RawData.initialize(acclerometer_sample_x.duplicate())
+	%RawDataX.initialize(acclerometer_sample_x.duplicate())
+	%RawDataY.initialize(acclerometer_sample_y.duplicate())
+	%RawDataZ.initialize(acclerometer_sample_z.duplicate())
 	
 	detrend_samples(15)
-	%DetrendedData.initialize(acclerometer_sample_x.duplicate())
+	%DetrendedDataX.initialize(acclerometer_sample_x.duplicate())
+	%DetrendedDataY.initialize(acclerometer_sample_y.duplicate())
+	%DetrendedDataZ.initialize(acclerometer_sample_z.duplicate())
 	
 	normalize_samples()
-	%NormalizedData.initialize(acclerometer_sample_x.duplicate())
+	%NormalizedDataX.initialize(acclerometer_sample_x.duplicate())
+	%NormalizedDataY.initialize(acclerometer_sample_y.duplicate())
+	%NormalizedDataZ.initialize(acclerometer_sample_z.duplicate())
 	
 	print("Done!")
 

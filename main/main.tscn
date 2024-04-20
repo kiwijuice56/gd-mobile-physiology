@@ -30,11 +30,22 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer"]
 layout_mode = 2
-text = "Raw Data (x)"
+text = "Raw Data "
 
-[node name="RawData" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataX" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="RawDataY" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="RawDataZ" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
 [node name="ChartContainer4" type="VBoxContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -43,12 +54,22 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
-text = "Detrended Data (x)"
+text = "Detrended Data "
 
-[node name="DetrendedData" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="DetrendedDataX" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-line_color = Color(0.619608, 0.286275, 0.501961, 1)
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="DetrendedDataY" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="DetrendedDataZ" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
 [node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -57,12 +78,22 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer3"]
 layout_mode = 2
-text = "Normalized Data (x)"
+text = "Normalized Data "
 
-[node name="NormalizedData" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+[node name="NormalizedDataX" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-line_color = Color(0.564706, 0.356863, 0.372549, 1)
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="NormalizedDataY" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="NormalizedDataZ" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
 [node name="HeartRateLabel" type="Label" parent="MarginContainer"]
 unique_name_in_owner = true
