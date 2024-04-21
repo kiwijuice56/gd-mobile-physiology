@@ -4,19 +4,24 @@ extends Control
 @export var line_color: Color = Color(0.5, 0.2, 0.9)
 @export var line_width: float = 1.0
 
-var y: Array
+var y: PackedFloat64Array
 
 func _draw() -> void:
 	if len(y) > 0:
-		plot()
+		draw_lines()
 
-func initialize(data: Array) -> void:
+func plot(data: PackedFloat64Array) -> void:
 	y = data
 	queue_redraw()
 
-func plot() -> void:
-	var max_y: float = y.max()
-	var min_y: float = y.min()
+func draw_lines() -> void:
+	var max_y: float = -INF
+	var min_y: float = INF
+	
+	for val in y:
+		max_y = max(max_y, val)
+		min_y = min(min_y, val)
+	
 	for i in range(1, len(y)):
 		var from: Vector2 = Vector2(
 			fit(i - 1, 0, len(y) - 1, size.x), 

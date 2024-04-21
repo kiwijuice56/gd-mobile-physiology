@@ -61,19 +61,19 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
-text = "Detrended + Normalized Data (Step 1, sliding window average, unit variance and mean = 0)"
+text = "Detrended, Normalized, and Filtered Data"
 
-[node name="DetrendedDataX" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataX" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="DetrendedDataY" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataY" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="DetrendedDataZ" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataZ" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
@@ -85,22 +85,17 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer5"]
 layout_mode = 2
-text = "ICA of Normalized Data (Step 2)"
+text = "Combined Pulse, then Filtered"
 
-[node name="ICA1" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="Pulse1" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-line_color = Color(0.627451, 0.380392, 1, 1)
+line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="ICA2" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="Pulse2" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-line_color = Color(0.689222, 0.51854, 1, 1)
-
-[node name="ICA3" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
-unique_name_in_owner = true
-layout_mode = 2
-line_color = Color(0.768415, 0.660724, 1, 1)
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
 [node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -109,38 +104,14 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer3"]
 layout_mode = 2
-text = "FFT of ICA signals, with predicted heart rate (Step 3)"
+text = "FFT of Filtered Pulse"
 
 [node name="FFT1" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
-line_color = Color(0.688985, 0.214044, 0.561498, 1)
+line_color = Color(0.539643, 0.331014, 0.657009, 1)
 
 [node name="HeartRateLabel1" type="Label" parent="MarginContainer/GridContainer/ChartContainer3/FFT1"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 0
-text = "Heart Rate: 0 bpm"
-
-[node name="FFT2" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
-unique_name_in_owner = true
-layout_mode = 2
-line_color = Color(0.858131, 0.368491, 0.713104, 1)
-
-[node name="HeartRateLabel2" type="Label" parent="MarginContainer/GridContainer/ChartContainer3/FFT2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 0
-text = "Heart Rate: 0 bpm"
-
-[node name="FFT3" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
-unique_name_in_owner = true
-layout_mode = 2
-line_color = Color(0.940148, 0.679678, 0.847109, 1)
-
-[node name="HeartRateLabel3" type="Label" parent="MarginContainer/GridContainer/ChartContainer3/FFT3"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8

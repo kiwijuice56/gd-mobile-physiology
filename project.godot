@@ -15,10 +15,6 @@ run/main_scene="res://main/main.tscn"
 config/features=PackedStringArray("4.2", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[autoload]
-
-FFT="*res://addons/godot-fft/Fft.gd"
-
 [display]
 
 window/size/viewport_width=1800
@@ -29,10 +25,6 @@ window/stretch/aspect="keep_height"
 [dotnet]
 
 project/assembly_name="heart-rate-sensor"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/godot-fft/plugin.cfg")
 
 [rendering]
 
