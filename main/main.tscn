@@ -1,8 +1,28 @@
-[gd_scene load_steps=4 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=6 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" path="res://main/HeartRateSensor.gd" id="1_nxemo"]
 [ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart.tscn" id="2_qtway"]
 [ext_resource type="Script" path="res://main/IndependentComponentAnalyzer.cs" id="2_vblly"]
+
+[sub_resource type="FontFile" id="FontFile_sehcc"]
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/32/0/ascent = 0.0
+cache/0/32/0/descent = 0.0
+cache/0/32/0/underline_position = 0.0
+cache/0/32/0/underline_thickness = 0.0
+cache/0/32/0/scale = 1.0
+cache/0/32/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/32/0 = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_0ufry"]
+default_font = SubResource("FontFile_sehcc")
+default_font_size = 32
 
 [node name="Main" type="Node"]
 
@@ -19,99 +39,122 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_0ufry")
 theme_override_constants/margin_left = 128
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="GraphButton" type="CheckButton" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 8
+text = "Graph?"
+
+[node name="PausedButton" type="CheckButton" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "Paused?"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 2
 
-[node name="ChartContainer" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+[node name="ChartContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer"]
+[node name="Title" type="Label" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer"]
 layout_mode = 2
 text = "Raw Data (x, y, z accelerometer readings)"
 
-[node name="RawDataX" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataX" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="RawDataY" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataY" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="RawDataZ" parent="MarginContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataZ" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="ChartContainer4" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+[node name="ChartContainer4" type="VBoxContainer" parent="MarginContainer/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer4"]
+[node name="Title" type="Label" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
 text = "Detrended, Normalized, and Filtered Data"
 
-[node name="FixedDataX" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataX" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="FixedDataY" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataY" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="FixedDataZ" parent="MarginContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataZ" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="ChartContainer5" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+[node name="ChartContainer5" type="VBoxContainer" parent="MarginContainer/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer5"]
+[node name="Title" type="Label" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer5"]
 layout_mode = 2
 text = "Combined Pulse, then Filtered"
 
-[node name="Pulse1" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="Pulse1" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="Pulse2" parent="MarginContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="Pulse2" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/GridContainer"]
+[node name="ChartContainer3" type="VBoxContainer" parent="MarginContainer/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="MarginContainer/GridContainer/ChartContainer3"]
+[node name="Title" type="Label" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer3"]
 layout_mode = 2
 text = "FFT of Filtered Pulse"
 
-[node name="FFT1" parent="MarginContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+[node name="FFT1" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.539643, 0.331014, 0.657009, 1)
 
-[node name="HeartRateLabel1" type="Label" parent="MarginContainer/GridContainer/ChartContainer3/FFT1"]
+[node name="HeartRateLabel1" type="Label" parent="MarginContainer/HBoxContainer/GridContainer/ChartContainer3/FFT1"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8

@@ -26,6 +26,10 @@ window/stretch/aspect="keep_height"
 
 project/assembly_name="heart-rate-sensor"
 
+[network]
+
+limits/debugger/max_chars_per_second=2147483646
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

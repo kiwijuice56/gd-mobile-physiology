@@ -6,12 +6,12 @@ var acclerometer_sample_y: PackedFloat64Array
 var acclerometer_sample_z: PackedFloat64Array
 
 var sample_count: int 
-var frame_index: int 
+var frame: int = 0
 
 func _ready() -> void:
 	set_physics_process(false)
 	
-	start_detection(1024 + len(Filter.BANDPASS_FILTER_BCG) + len(Filter.BANDPASS_FILTER_HR))
+	start_detection(512 * 2 + len(Filter.BANDPASS_FILTER_BCG) + len(Filter.BANDPASS_FILTER_HR))
 
 func _physics_process(_delta: float) -> void:
 	var sample: Vector3 = Input.get_accelerometer()
@@ -20,19 +20,18 @@ func _physics_process(_delta: float) -> void:
 	acclerometer_sample_y.append(sample.y)
 	acclerometer_sample_z.append(sample.z)
 	
+	if frame % 64 == 0:
+		%RawDataX.plot(acclerometer_sample_x)
+		%RawDataY.plot(acclerometer_sample_y)
+		%RawDataZ.plot(acclerometer_sample_z)
+	frame += 1
+	
 	if len(acclerometer_sample_x) > sample_count:
-		acclerometer_sample_x.remove_at(0)
-		acclerometer_sample_y.remove_at(0)
-		acclerometer_sample_z.remove_at(0)
+		analyze_data([acclerometer_sample_x.duplicate(), acclerometer_sample_y.duplicate(), acclerometer_sample_z.duplicate()])
 		
-		if frame_index % 256 == 0:
-			analyze_data([acclerometer_sample_x.duplicate(), acclerometer_sample_y.duplicate(), acclerometer_sample_z.duplicate()])
-	
-	%RawDataX.plot(acclerometer_sample_x)
-	%RawDataY.plot(acclerometer_sample_y)
-	%RawDataZ.plot(acclerometer_sample_z)
-	
-	frame_index += 1
+		acclerometer_sample_x = acclerometer_sample_x.slice(256)
+		acclerometer_sample_y = acclerometer_sample_y.slice(256)
+		acclerometer_sample_z = acclerometer_sample_z.slice(256)
 
 func start_detection(max_sample_count: int) -> void:
 	set_physics_process(true)
@@ -122,49 +121,42 @@ func extract_heartrate(fft: PackedFloat64Array, threshold: float = 0.1):
 			if fft[i] > max_amplitude and fft[i] > threshold:
 				max_amplitude = fft[i]
 				max_amplitude_frequency = frequency
+	print(max_amplitude_frequency * 60, " confidence: ", max_amplitude)
 	return max_amplitude_frequency * 60
 
 func get_fourier_transform(sample: PackedFloat64Array) -> PackedFloat64Array:
-	# The FFT function expects an ambiguous array, as it modifies it with
-	# ComplexNumber objects in-place for performance reasons
-	var data: Array = []
+	var complex_data: Array[Complex] = []
 	for val in sample:
-		data.append(val)
-	var complex_numbers: Array = fft(data)
+		complex_data.append(Complex.new(val, 0.0))
+	var complex_result: Array[Complex] = fft(complex_data)
 	var fft_magnitudes: PackedFloat64Array = []
-	for i in range(len(complex_numbers) / 2):
-		var num: Complex = complex_numbers[i]
+	for i in range(len(complex_result) / 2):
+		var num: Complex = complex_result[i]
 		fft_magnitudes.append(sqrt(num.re ** 2 + num.im ** 2))
 	return fft_magnitudes
 
-func fft(amplitudes: Array) -> Array:
-	var N = len(amplitudes)
+func fft(a: Array[Complex]) -> Array[Complex]:
+	var N: int = len(a)
 	if N <= 1:
-		return amplitudes
-	var hN = N / 2
-	var even = []
-	var odd = []
-	# Divide
-	even.resize(hN)
-	odd.resize(hN)
+		return a
+	var hN: int = N / 2
+	var a0: Array[Complex] = []
+	var a1: Array[Complex]  = []
+	a0.resize(hN)
+	a1.resize(hN)
 	for i in range(0, hN):
-		even[i] = amplitudes[i * 2]
-		odd[i] = amplitudes[i * 2 + 1]
-	# And conquer
-	even = fft(even)
-	odd = fft(odd)
-	var a := -2.0 * PI
-	for k in range(0, hN):
-		if not even[k] is Complex:
-			even[k] = Complex.new(even[k], 0)
-		if not odd[k] is Complex:
-			odd[k] = Complex.new(odd[k], 0)
-		var p = k / float(N)
-		var t = Complex.new(0, a * p)
-		t.cexp(t).mul(odd[k], t)
-		amplitudes[k] = even[k].add(t, odd[k])
-		amplitudes[k + hN] = even[k].sub(t, even[k])
-	return amplitudes
+		a0[i] = a[i * 2]
+		a1[i] = a[i * 2 + 1]
+	a0 = fft(a0)
+	a1 = fft(a1)
+	var ang: float = -2.0 * PI / N 
+	var w: Complex = Complex.new(1.0, 0.0)
+	var wn: Complex = Complex.new(cos(ang), sin(ang))
+	for i in range(0, hN):
+		a[i] = w.mul(a1[i]).add(a0[i])
+		a[i + N / 2] = a0[i].sub(w.mul(a1[i]))
+		w = w.mul(wn)
+	return a
 
 func get_average(arr: PackedFloat64Array) -> float:
 	var average: float = 0

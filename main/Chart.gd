@@ -12,6 +12,8 @@ func _draw() -> void:
 
 func plot(data: PackedFloat64Array) -> void:
 	y = data
+	if not get_parent().get_node("%GraphButton").button_pressed:
+		y = PackedFloat64Array([0.0, 1.0])
 	queue_redraw()
 
 func draw_lines() -> void:

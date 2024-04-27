@@ -1,41 +1,37 @@
 extends RefCounted
 class_name Complex
 
-var re := 0.0
-var im := 0.0
+var re: float = 0.0
+var im: float = 0.0
 
-
-func _init(re, im := 0.0):
+func _init(re: float, im: float = 0.0):
 	self.re = re
 	self.im = im
 
-
-func add(other, dst):
+func add(other: Complex) -> Complex:
+	var dst: Complex = Complex.new(0.0, 0.0)
 	dst.re = self.re + other.re
 	dst.im = self.im + other.im
 	return dst
 
 
-func sub(other, dst):
+func sub(other: Complex) -> Complex:
+	var dst: Complex = Complex.new(0.0, 0.0)
 	dst.re = self.re - other.re
 	dst.im = self.im - other.im
 	return dst
 
-
-func mul(other, dst):
-	# cache re in case dst == self
-	var r = self.re * other.re - self.im * other.im
+func mul(other) -> Complex:
+	var dst: Complex = Complex.new(0.0, 0.0)
+	dst.re = self.re * other.re - self.im * other.im
 	dst.im = self.re * other.im + self.im * other.re
-	dst.re = r
 	return dst
-
 
 func cexp(dst):
 	var er = exp(self.re)
 	dst.re = er * cos(self.im)
 	dst.im = er * sin(self.im)
 	return dst
-
 
 func log():
 	# although 'It's just a matter of separating out the real and imaginary parts of jw.' is not a helpful quote
