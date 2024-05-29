@@ -11,7 +11,7 @@ var frame: int = 0
 func _ready() -> void:
 	set_physics_process(false)
 	
-	start_detection(2048 + len(Filter.LOW_PASS_RESPIRATION))
+	start_detection(1024 + len(Filter.LOW_PASS_RESPIRATION))
 
 func _physics_process(_delta: float) -> void:
 	var sample: Vector3 = Input.get_accelerometer()
@@ -73,7 +73,7 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> void:
 		if fft[index] > maximum_confidence:
 			maximum_confidence = fft[index]
 			cleanest_rate = 60.0 / len(fft) * index
-			print(i)
+			print(i, " ", maximum_confidence)
 	
 	%RespirationRateLabel.text = "Respiration Rate: %.03f Hz, %.01f bpm" % [cleanest_rate, cleanest_rate * 60]
 
