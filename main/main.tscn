@@ -1,33 +1,44 @@
-[gd_scene load_steps=6 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=8 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" path="res://main/RespirationRateSensor.gd" id="1_8n7nf"]
-[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart.tscn" id="2_qtway"]
-[ext_resource type="Script" path="res://main/IndependentComponentAnalyzer.cs" id="2_vblly"]
+[ext_resource type="Script" path="res://main/Main.gd" id="1_65tux"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart/chart.tscn" id="2_qtway"]
+[ext_resource type="Script" path="res://main/signal_processing/IndependentComponentAnalyzer.cs" id="2_vblly"]
+[ext_resource type="Script" path="res://main/sampler/Sampler.gd" id="2_vkx86"]
 
 [sub_resource type="FontFile" id="FontFile_sehcc"]
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/32/0 = Vector2(0, 0)
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
 cache/0/32/0/ascent = 0.0
 cache/0/32/0/descent = 0.0
 cache/0/32/0/underline_position = 0.0
 cache/0/32/0/underline_thickness = 0.0
 cache/0/32/0/scale = 1.0
-cache/0/32/0/kerning_overrides/16/0 = Vector2(0, 0)
 cache/0/32/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="Theme" id="Theme_0ufry"]
 default_font = SubResource("FontFile_sehcc")
 default_font_size = 32
 
 [node name="Main" type="Node"]
+script = ExtResource("1_65tux")
 
 [node name="RespirationRateSensor" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("1_8n7nf")
+
+[node name="Sampler" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_vkx86")
 
 [node name="ICA" type="Node" parent="."]
 unique_name_in_owner = true
@@ -51,21 +62,6 @@ theme_override_constants/separation = 16
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/HBoxContainer"]
 layout_mode = 2
-
-[node name="GraphButton" type="CheckButton" parent="UI/HBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 8
-button_pressed = true
-text = "Graph?"
-
-[node name="PausedButton" type="CheckButton" parent="UI/HBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
-text = "Paused?"
 
 [node name="GridContainer" type="GridContainer" parent="UI/HBoxContainer"]
 layout_mode = 2
