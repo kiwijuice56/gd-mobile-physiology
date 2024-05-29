@@ -105,7 +105,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
-text = "Detrended + Z-Scored Data"
+text = "Detrended, Z-Scored, and Filtered Data"
 
 [node name="FixedDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
@@ -129,14 +129,19 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer5"]
 layout_mode = 2
-text = "Combined Pulse, then Filtered"
+text = "ICA Output"
 
-[node name="Pulse1" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA1" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="Pulse2" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA2" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA3" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
@@ -146,18 +151,9 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer3"]
-layout_mode = 2
-text = "FFT of Filtered Pulse"
-
-[node name="HeartRateLabel1" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer3"]
+[node name="RespirationRateLabel" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-text = "Heart Rate: 0 bpm"
-
-[node name="FFT1" parent="UI/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
-unique_name_in_owner = true
-layout_mode = 2
-line_color = Color(0.539643, 0.331014, 0.657009, 1)
+text = "Respiration Rate:"

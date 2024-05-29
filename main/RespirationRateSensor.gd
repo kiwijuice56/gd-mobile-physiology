@@ -11,7 +11,7 @@ var frame: int = 0
 func _ready() -> void:
 	set_physics_process(false)
 	
-	start_detection(1024)
+	start_detection(2048 + len(Filter.LOW_PASS_RESPIRATION))
 
 func _physics_process(_delta: float) -> void:
 	var sample: Vector3 = Input.get_accelerometer()
@@ -28,6 +28,7 @@ func _physics_process(_delta: float) -> void:
 	
 	if len(acclerometer_sample_x) > sample_count:
 		analyze_data([acclerometer_sample_x.duplicate(), acclerometer_sample_y.duplicate(), acclerometer_sample_z.duplicate()])
+		set_physics_process(false) # STOP
 		
 		acclerometer_sample_x = acclerometer_sample_x.slice(256)
 		acclerometer_sample_y = acclerometer_sample_y.slice(256)
@@ -41,12 +42,40 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> void:
 	detrend_samples(samples, 128)
 	normalize_samples(samples, true) # z-scoring
 	
+	# Filter out high frequencies
+	for i in range(len(samples)):
+		samples[i] = apply_fir_filter(samples[i], Filter.LOW_PASS_RESPIRATION)
+	
 	%FixedDataX.plot(samples[0].duplicate())
 	%FixedDataY.plot(samples[1].duplicate())
 	%FixedDataZ.plot(samples[2].duplicate())
 	
-	# apply ICA
-	# extract data
+	var ica_result: Array = %ICA.analyze(samples[0], samples[1], samples[2], len(samples[0]))
+	var ica_signals: Array[PackedFloat64Array] = []
+	
+	for signal_idx in range(3):
+		var output: PackedFloat64Array = []
+		for sample_idx in range(len(samples[0])):
+			output.append(ica_result[sample_idx][signal_idx])
+		ica_signals.append(output)
+	
+	%ICA1.plot(ica_signals[0].duplicate())
+	%ICA2.plot(ica_signals[1].duplicate())
+	%ICA3.plot(ica_signals[2].duplicate())
+	
+	var maximum_confidence: float = 0.0
+	var cleanest_rate: float = 0.0
+	for i in range(len(ica_signals)):
+		var ica_signal: PackedFloat64Array = ica_signals[i]
+		var fft: PackedFloat64Array = get_fourier_transform(ica_signal)
+		var index: int = extract_respiration_rate(fft)
+		
+		if fft[index] > maximum_confidence:
+			maximum_confidence = fft[index]
+			cleanest_rate = 60.0 / len(fft) * index
+			print(i)
+	
+	%RespirationRateLabel.text = "Respiration Rate: %.03f Hz, %.01f bpm" % [cleanest_rate, cleanest_rate * 60]
 
 func detrend_samples(samples: Array[PackedFloat64Array], window_size: int) -> void:
 	for sample in samples:
@@ -74,6 +103,19 @@ func normalize_samples(samples: Array[PackedFloat64Array], scale: bool) -> void:
 			var stdev: float = get_standard_deviation(sample)
 			for i in range(len(sample)):
 				sample[i] /= stdev
+
+func extract_respiration_rate(fft: PackedFloat64Array, threshold: float = 0.01) -> int:
+	var max_amplitude_frequency: float = 0
+	var max_amplitude: float = 0
+	var output_index: int = -1
+	for i in range(len(fft)):
+		var frequency: float = 60.0 / len(fft) * i
+		if 0.15 < frequency and frequency < 0.3:
+			if fft[i] > max_amplitude and fft[i] > threshold:
+				max_amplitude = fft[i]
+				max_amplitude_frequency = frequency
+				output_index = i
+	return output_index
 
 func apply_fir_filter(sample: PackedFloat64Array, filter: PackedFloat64Array) -> PackedFloat64Array:
 	var output: PackedFloat64Array = []

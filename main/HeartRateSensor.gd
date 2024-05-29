@@ -74,7 +74,6 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> void:
 		fourier_transform[i] /= len(fourier_transform)
 	
 	%FFT1.plot(fourier_transform)
-	print(len(fourier_transform))
 	
 	%HeartRateLabel1.text = "Heart Rate (bpm): " + str(extract_heartrate(fourier_transform))
 
