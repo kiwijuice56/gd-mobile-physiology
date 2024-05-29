@@ -8,7 +8,6 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> float:
 	%RawDataY.plot(samples[1].duplicate())
 	%RawDataZ.plot(samples[2].duplicate())
 	
-	
 	# Step 1) 
 	# Use a sliding window average to detrend the samples; Window size
 	# chosen arbitrarily 
