@@ -1,4 +1,4 @@
-class_name HeartRateSensor
+class_name RespirationRateSensor
 extends Node
 
 var acclerometer_sample_x: PackedFloat64Array
@@ -11,7 +11,7 @@ var frame: int = 0
 func _ready() -> void:
 	set_physics_process(false)
 	
-	start_detection(2048 * 2 + len(Filter.BANDPASS_FILTER_BCG) + len(Filter.BANDPASS_FILTER_HR))
+	start_detection(1024)
 
 func _physics_process(_delta: float) -> void:
 	var sample: Vector3 = Input.get_accelerometer()
@@ -38,45 +38,15 @@ func start_detection(max_sample_count: int) -> void:
 	sample_count = max_sample_count
 
 func analyze_data(samples: Array[PackedFloat64Array]) -> void:
-	# Remove trends, set variance of each signal to 1 and mean to 0
-	# detrend_samples(samples, 15)
-	# normalize_samples(samples, false)
+	detrend_samples(samples, 128)
+	normalize_samples(samples, true) # z-scoring
 	
-	# Isolate BCG movements with bandpass filter, cutoffs at 7 and 13 Hz
-	# for i in range(len(samples)):
-	# 	samples[i] = apply_fir_filter(samples[i], Filter.LOW_PASS)
+	%FixedDataX.plot(samples[0].duplicate())
+	%FixedDataY.plot(samples[1].duplicate())
+	%FixedDataZ.plot(samples[2].duplicate())
 	
-	# %FixedDataX.plot(samples[0].duplicate())
-	# %FixedDataY.plot(samples[1].duplicate())
-	# %FixedDataZ.plot(samples[2].duplicate())
-	
-	# Get the magnitudes of the filtered signals
-	var magnitudes: PackedFloat64Array = []
-	for i in range(len(samples[0])):
-		var value: float = 0
-		for j in range(len(samples)):
-			value += pow(samples[j][i], 2)
-		magnitudes.append(sqrt(value))
-	
-	%Pulse1.plot(magnitudes)
-	
-	# Isolate the heartrate again with a bandpass filter, cutoffs at 0.66 and 2.50 Hz
-	magnitudes = apply_fir_filter(magnitudes, Filter.LOW_PASS)
-	
-	normalize_samples([magnitudes], true)
-	
-	%Pulse2.plot(magnitudes)
-	
-	var fourier_transform: PackedFloat64Array = get_fourier_transform(magnitudes)
-	
-	# Normalize amplitude
-	for i in range(len(fourier_transform)):
-		fourier_transform[i] /= len(fourier_transform)
-	
-	%FFT1.plot(fourier_transform)
-	print(len(fourier_transform))
-	
-	%HeartRateLabel1.text = "Heart Rate (bpm): " + str(extract_heartrate(fourier_transform))
+	# apply ICA
+	# extract data
 
 func detrend_samples(samples: Array[PackedFloat64Array], window_size: int) -> void:
 	for sample in samples:
@@ -113,18 +83,6 @@ func apply_fir_filter(sample: PackedFloat64Array, filter: PackedFloat64Array) ->
 			weighted_value += sample[i - k] * filter[k]
 		output.append(weighted_value)
 	return output
-
-func extract_heartrate(fft: PackedFloat64Array, threshold: float = 0.01):
-	var max_amplitude_frequency: float = 0
-	var max_amplitude: float = 0
-	for i in range(len(fft)):
-		var frequency: float = 60.0 / len(fft) * i
-		if .66 < frequency and frequency < 2.0:
-			if fft[i] > max_amplitude and fft[i] > threshold:
-				max_amplitude = fft[i]
-				max_amplitude_frequency = frequency
-	print(max_amplitude_frequency * 60, " confidence: ", max_amplitude)
-	return max_amplitude_frequency * 60
 
 func get_fourier_transform(sample: PackedFloat64Array) -> PackedFloat64Array:
 	var complex_data: Array[Complex] = []

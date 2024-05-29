@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://main/Chart.gd" id="1_0lcky"]
 
 [node name="Chart" type="PanelContainer"]
+offset_right = 117.0
+offset_bottom = 50.0
 size_flags_vertical = 3
 script = ExtResource("1_0lcky")
 
