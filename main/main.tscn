@@ -153,3 +153,8 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Respiration Rate:"
+
+[node name="FFT" parent="UI/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)

@@ -47,26 +47,28 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> float:
 	for i in range(len(ica_signals)):
 		var ica_signal: PackedFloat64Array = ica_signals[i]
 		var fft: PackedFloat64Array = SignalHelper.get_fourier_transform(ica_signal)
-		var index: int = extract_respiration_rate(fft)
+		var index: int = extract_respiration_rate(fft, 5, 18)
 		
 		if fft[index] > maximum_confidence:
 			maximum_confidence = fft[index]
 			cleanest_rate = 60.0 / len(fft) * index
+			%FFT.plot(fft.slice(0, int(len(fft) / 6)))
 			print(i, " ", maximum_confidence)
+	
+	
 	
 	%RespirationRateLabel.text = "Respiration Rate: %.03f Hz, %.01f bpm" % [cleanest_rate, cleanest_rate * 60]
 	return cleanest_rate * 60
 
 # Returns the index that corresponds to the strongest signal in the FFT
 # within respiration rate ranges
-func extract_respiration_rate(fft: PackedFloat64Array, threshold: float = 0.01) -> int:
+func extract_respiration_rate(fft: PackedFloat64Array, min_bpm: float, max_bpm: float) -> int:
 	var max_amplitude: float = 0
 	var output_index: int = -1
 	for i in range(len(fft)):
 		var frequency: float = 60.0 / len(fft) * i
-		if 0.13 < frequency and frequency < 0.66:
-			if fft[i] > max_amplitude and fft[i] > threshold:
-				max_amplitude = fft[i]
-				output_index = i
+		if min_bpm/60.0 < frequency and frequency < max_bpm/60.0 and fft[i] > max_amplitude:
+			max_amplitude = fft[i]
+			output_index = i
 	return output_index
 
