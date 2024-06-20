@@ -37,6 +37,14 @@ static func apply_fir_filter(sample: PackedFloat64Array, filter: PackedFloat64Ar
 		output.append(weighted_value)
 	return output
 
+static func apply_hanning_window(samples: PackedFloat64Array) -> PackedFloat64Array:
+	var output: PackedFloat64Array = []
+	var N: int = len(samples)
+	for i in range(N):
+		var m = 0.5 * (1.0 - cos(2 * PI * i / (N - 1)))
+		output.append(samples[i] * m)
+	return output
+
 static func get_fourier_transform(sample: PackedFloat64Array) -> PackedFloat64Array:
 	var complex_data: Array[Complex] = []
 	for val in sample:
@@ -84,3 +92,9 @@ static func get_standard_deviation(arr: PackedFloat64Array) -> float:
 	for val in arr:
 		stdev += pow(val - average, 2)
 	return sqrt(stdev / len(arr))
+
+static func get_peaks(arr: PackedFloat64Array) -> Array[int]:
+	var mean: float = get_average(arr)
+	var peaks: Array[int] = []
+	
+	return peaks

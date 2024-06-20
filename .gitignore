@@ -2,3 +2,4 @@
 .godot/
 *.apk
 *.apk.idsig
+*.tmp

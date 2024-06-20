@@ -17,6 +17,8 @@ cache/0/32/0/underline_thickness = 0.0
 cache/0/32/0/scale = 1.0
 cache/0/32/0/kerning_overrides/32/0 = Vector2(0, 0)
 cache/0/32/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/20/0 = Vector2(0, 0)
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -24,6 +26,26 @@ cache/0/16/0/underline_thickness = 0.0
 cache/0/16/0/scale = 1.0
 cache/0/16/0/kerning_overrides/32/0 = Vector2(0, 0)
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/20/0 = Vector2(0, 0)
+cache/0/12/0/ascent = 0.0
+cache/0/12/0/descent = 0.0
+cache/0/12/0/underline_position = 0.0
+cache/0/12/0/underline_thickness = 0.0
+cache/0/12/0/scale = 1.0
+cache/0/12/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/20/0 = Vector2(0, 0)
+cache/0/20/0/ascent = 0.0
+cache/0/20/0/descent = 0.0
+cache/0/20/0/underline_position = 0.0
+cache/0/20/0/underline_thickness = 0.0
+cache/0/20/0/scale = 1.0
+cache/0/20/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/20/0 = Vector2(0, 0)
 
 [sub_resource type="Theme" id="Theme_0ufry"]
 default_font = SubResource("FontFile_sehcc")
@@ -77,7 +99,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer"]
 layout_mode = 2
-text = "Raw Data (x, y, z accelerometer readings)"
+text = "Raw Data (x, y, z accelerometer + gyro readings)"
 
 [node name="RawDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
@@ -90,6 +112,21 @@ layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
 [node name="RawDataZ" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="RawDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="RawDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="RawDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
@@ -118,6 +155,21 @@ unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
+[node name="FixedDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="FixedDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="FixedDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
 [node name="ChartContainer5" type="VBoxContainer" parent="UI/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -138,6 +190,21 @@ layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
 [node name="ICA3" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA4" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.267137, 0.617942, 0.561183, 1)
+
+[node name="ICA5" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA6" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
