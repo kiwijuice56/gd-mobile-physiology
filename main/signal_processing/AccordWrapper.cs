@@ -8,9 +8,9 @@ using Accord.Statistics.Models.Regression.Linear;
 using Accord.Math;
 using Accord.Math.Transforms;
 
-
-public partial class IndependentComponentAnalyzer : Node {
-	public Godot.Collections.Array analyze(
+[GlobalClass]
+public partial class AccordWrapper : RefCounted {
+	public static Godot.Collections.Array ica(
 		Godot.Collections.Array a_x, 
 		Godot.Collections.Array a_y, 
 		Godot.Collections.Array a_z,
@@ -51,7 +51,7 @@ public partial class IndependentComponentAnalyzer : Node {
 		return godot_result;
 	}
 	
-	public Godot.Collections.Array fft(
+	public static Godot.Collections.Array fft(
 		Godot.Collections.Array real_data, 
 		int size) {
 		

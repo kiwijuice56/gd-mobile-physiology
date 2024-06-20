@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=7 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" path="res://main/RespirationRateSensor.gd" id="1_8n7nf"]
 [ext_resource type="Script" path="res://main/Main.gd" id="1_65tux"]
 [ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart/chart.tscn" id="2_qtway"]
-[ext_resource type="Script" path="res://main/signal_processing/IndependentComponentAnalyzer.cs" id="2_vblly"]
 [ext_resource type="Script" path="res://main/sampler/Sampler.gd" id="2_vkx86"]
 
 [sub_resource type="FontFile" id="FontFile_sehcc"]
@@ -61,10 +60,6 @@ script = ExtResource("1_8n7nf")
 [node name="Sampler" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("2_vkx86")
-
-[node name="ICA" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("2_vblly")
 
 [node name="UI" type="MarginContainer" parent="."]
 anchors_preset = 15

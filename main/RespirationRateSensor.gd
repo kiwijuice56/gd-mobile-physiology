@@ -34,7 +34,7 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> float:
 	
 	# Step 4)
 	# Run ICA (using external C# Accord library) 
-	var ica_result: Array = %ICA.analyze(samples[0], samples[1], samples[2], samples[3], samples[4], samples[5], len(samples[0]))
+	var ica_result: Array = AccordWrapper.ica(samples[0], samples[1], samples[2], samples[3], samples[4], samples[5], len(samples[0]))
 	var ica_signals: Array[PackedFloat64Array] = []
 	for signal_idx in range(6):
 		var output: PackedFloat64Array = []
@@ -44,14 +44,14 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> float:
 		ica_signals.append(filtered_ica_signal)
 	
 	# Step 5)
-	# Use FFT to find the strongest signal within respiration rate ranges
+	# Use FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
 	var maximum_confidence: float = 0.0
 	var cleanest_rate: float = 0.0
 	var cleanest_index: int = 0
 	for i in range(len(ica_signals)):
 		var ica_signal: PackedFloat64Array = ica_signals[i]
-		var fft: PackedFloat64Array = %ICA.fft(ica_signal, len(ica_signal))
-		var index: int = extract_respiration_rate(fft, 5, 18)
+		var fft: PackedFloat64Array = AccordWrapper.fft(ica_signal, len(ica_signal))
+		var index: int = RespirationRateSensor.extract_respiration_rate(fft, 8, 45)
 		
 		if fft[index] > maximum_confidence:
 			cleanest_index = i
@@ -73,7 +73,7 @@ func analyze_data(samples: Array[PackedFloat64Array]) -> float:
 
 # Returns the index that corresponds to the strongest signal in the FFT
 # within respiration rate ranges
-func extract_respiration_rate(fft: PackedFloat64Array, min_bpm: float, max_bpm: float) -> int:
+static func extract_respiration_rate(fft: PackedFloat64Array, min_bpm: float, max_bpm: float) -> int:
 	var max_amplitude: float = 0
 	var output_index: int = -1
 	for i in range(len(fft)):
