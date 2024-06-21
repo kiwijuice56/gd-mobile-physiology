@@ -93,8 +93,12 @@ static func get_standard_deviation(arr: PackedFloat64Array) -> float:
 		stdev += pow(val - average, 2)
 	return sqrt(stdev / len(arr))
 
-static func get_peaks(arr: PackedFloat64Array) -> Array[int]:
-	var mean: float = get_average(arr)
-	var peaks: Array[int] = []
-	
-	return peaks
+static func extract_rate(fft: PackedFloat64Array, min_bpm: float, max_bpm: float) -> int:
+	var max_amplitude: float = 0
+	var output_index: int = -1
+	for i in range(len(fft)):
+		var frequency: float = 60.0 / len(fft) * i
+		if min_bpm/60.0 < frequency and frequency < max_bpm/60.0 and fft[i] > max_amplitude:
+			max_amplitude = fft[i]
+			output_index = i
+	return output_index
