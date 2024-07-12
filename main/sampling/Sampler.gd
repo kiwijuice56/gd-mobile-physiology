@@ -1,6 +1,8 @@
 class_name Sampler
 extends Node
 
+# Samples accelerometer and gyroscope data to feed into breathing/heart rate algorithms
+
 var accelerometer: Array[Vector3]
 var gyroscope: Array[Vector3]
 
@@ -13,8 +15,6 @@ func _ready() -> void:
 	set_physics_process(false)
 
 func _physics_process(_delta: float) -> void:
-	var sample_accel: Vector3 = Input.get_accelerometer()
-	
 	accelerometer.append(Input.get_accelerometer())
 	gyroscope.append(Input.get_gyroscope())
 	

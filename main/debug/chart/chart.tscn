@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bsjbwo2ih2fke"]
 
-[ext_resource type="Script" path="res://main/chart/Chart.gd" id="1_0lcky"]
+[ext_resource type="Script" path="res://main/debug/chart/Chart.gd" id="1_0lcky"]
 
 [node name="Chart" type="PanelContainer"]
 offset_right = 117.0

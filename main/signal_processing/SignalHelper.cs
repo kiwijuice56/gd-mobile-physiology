@@ -8,6 +8,10 @@ using Accord.Statistics.Models.Regression.Linear;
 using Accord.Math;
 using Accord.Math.Transforms;
 
+// Implements helper methods for common signal processing algorithms
+
+// Requires Accord.NET
+
 [GlobalClass]
 public partial class SignalHelper : RefCounted {
 	public static double Average(double[] sample) {
@@ -27,6 +31,9 @@ public partial class SignalHelper : RefCounted {
 		return Math.Sqrt(stdev / sample.Length);
 	}
 	
+	// Removes overall patterns in a signal, such as subtly increasing
+	// or decreasing over time. A good windowSize requires some experimentation,
+	// but 1/8 - 1/16 of the sample size is a good rule of thumb
 	public static double[] Detrend(double[] sample, int windowSize) {
 		double totalAverage = sample[0];
 		double average = totalAverage;
@@ -43,6 +50,7 @@ public partial class SignalHelper : RefCounted {
 		return output;
 	}
 	
+	// Sets the mean and standard deviation of a signal to 0 and 1 respectively
 	public static void Normalize(double[] sample) {
 		double average = Average(sample);
 		double stdev = StandardDeviation(sample);
@@ -52,6 +60,8 @@ public partial class SignalHelper : RefCounted {
 		}
 	} 
 	
+	// Applies a Finite Impulse Response (FIR) filter to 
+	// isolate frequency ranges in the signal
 	public static double[] ApplyFirFilter(double[] sample, double[] filter) {
 		double[] output = new double[sample.Length - filter.Length];
 		for (int i = filter.Length; i < sample.Length; i++) {
@@ -79,6 +89,7 @@ public partial class SignalHelper : RefCounted {
 		return transposedData;
 	}
 	
+	// Isolates correlated signals into clean possible components
 	public static double[][] IndependentComponentAnalysis(double[][] samples) {
 		// Accord.NET expects each column to be an input to ICA,
 		// while the rest of this program expects each row
@@ -106,6 +117,8 @@ public partial class SignalHelper : RefCounted {
 		return realComponent;
 	}
 	
+	// Finds the index within the Fourier transform corresponding to the highest amplitude 
+	// within the given frequency range (in beats per minute).
 	public static int ExtractRate(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
 		double maxAmplitude = 0.0;
 		int outputIndex = 0;

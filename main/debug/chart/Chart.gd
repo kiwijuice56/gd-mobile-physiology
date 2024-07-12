@@ -1,17 +1,19 @@
 class_name Chart
 extends Control
 
+# Debug class to plot signals
+
 @export var line_color: Color = Color(0.5, 0.2, 0.9)
 @export var line_width: float = 1.0
 
-var y: Array
+var y: PackedFloat64Array
 
 func _draw() -> void:
 	if len(y) > 0:
 		draw_lines()
 
 func plot(data: Array) -> void:
-	y = data
+	y = PackedFloat64Array(data)
 	queue_redraw()
 
 func draw_lines() -> void:

@@ -1,14 +1,25 @@
 using Godot;
 using System;
 
+// Calculates breathing rate from gyroscope and accelerometer samples
+
 [GlobalClass]
 public partial class BreathingRateAlgorithm : GodotObject {
 	private const int DetrendWindowSize = 128;
 	
+	// Accepts accelerometer and gyroscope samples and returns an estimated breathing rate in beats per minute.
+	// Algorithm modified from `BioPhone: Physiology Monitoring from Peripheral Smartphone Motions: Javier Hernandez, Daniel J. McDuff and Rosalind W. Picard.`
+	// If `debugInfo` is not null, it will be filled with the following items:
+	// - Raw[Accel/Gyro][X/Y/Z]: Signals before any processing
+	// - Preprocessed[Accel/Gyro][X/Y/Z]: Signals after basic processing
+	// - ICAOutput[0/1/2/3/4/5]: Output of independent component analysis in random order
+	// - SelectedICAIndex: The ICA signal that was used for determining breathing rate
+	// - FFT: The Fourier transform for the selected ICA signal
 	public static double Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, Godot.Collections.Dictionary debugInfo = null) {
 		int sampleSize = accel.Count;
 		
-		// Step 1) Load data into a more compact format
+		// Step 1) 
+		// Load data into arrays
 		double[][] data = new double[6][];
 		for (int i = 0; i < 6; i++) {
 			data[i] = new double[sampleSize];
@@ -73,6 +84,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		double maxConfidence = 0.0;
 		double maxConfidenceFrequency = 0.0;
 		for (int i = 0; i < 6; i++) {
+			//  [not in paper] Use a low pass filter to isolate signals < 1 Hz
 			data[i] = SignalHelper.ApplyFirFilter(data[i], LowPassRespirationFilter);
 			
 			double[] fft = SignalHelper.FastFourierTransform(data[i]);
