@@ -15,10 +15,9 @@ public partial class BreathingRateAlgorithm : GodotObject {
 	// - ICAOutput[0/1/2/3/4/5]: Output of independent component analysis in random order
 	// - SelectedICAIndex: The ICA signal that was used for determining breathing rate
 	// - FFT: The Fourier transform for the selected ICA signal
-	public static double Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, Godot.Collections.Dictionary debugInfo = null) {
+	public static double Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, Godot.Collections.Dictionary debugInfo, bool debug) {
 		int sampleSize = accel.Count;
 		
-		// Step 1) 
 		// Load data into arrays
 		double[][] data = new double[6][];
 		for (int i = 0; i < 6; i++) {
@@ -33,7 +32,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			data[5][i] = gyro[i].Z;
 		}
 		
-		if (debugInfo != null) {
+		if (debug) {
 			debugInfo["RawAccelX"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["RawAccelY"] = new Godot.Collections.Array<double>(data[1]);
 			debugInfo["RawAccelZ"] = new Godot.Collections.Array<double>(data[2]);
@@ -42,25 +41,11 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["RawGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
-		// Step 2) 
-		// Use a sliding window average to detrend the samples
 		for (int i = 0; i < 6; i++) {
-			data[i] = SignalHelper.Detrend(data[i], DetrendWindowSize);
-		}
+			data[i] = PreprocessSignal(data[i]);
+		} 
 		
-		// Step 3) 
-		// Set mean and variance to 0 (z-scoring)
-		for (int i = 0; i < 6; i++) {
-			SignalHelper.Normalize(data[i]);
-		}
-		
-		// Step 4) 
-		//  [not in paper] Use a low pass filter to isolate signals < 1 Hz
-		for (int i = 0; i < 6; i++) {
-			data[i] = SignalHelper.ApplyFirFilter(data[i], LowPassRespirationFilter);
-		}
-		
-		if (debugInfo != null) {
+		if (debug) {
 			debugInfo["PreprocessedAccelX"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["PreprocessedAccelY"] = new Godot.Collections.Array<double>(data[1]);
 			debugInfo["PreprocessedAccelZ"] = new Godot.Collections.Array<double>(data[2]);
@@ -69,37 +54,34 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
-		
-		// Step 5)
 		// Run ICA (using external C# Accord library) 
 		data = SignalHelper.IndependentComponentAnalysis(data);
 		
-		if (debugInfo != null) {
+		// Run FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
+		for (int i = 0 ; i < 6; i++) {
+			data[i] = FrequencyDomain(data[i]);
+		}
+		
+		if (debug) {
 			debugInfo["SelectedICAIndex"] = 0; 
 			debugInfo["FFT"] = new Godot.Collections.Array<double>();
 		} 
 		
-		// Step 6)
-		// Use FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
 		double maxConfidence = 0.0;
 		double maxConfidenceFrequency = 0.0;
 		for (int i = 0; i < 6; i++) {
-			//  [not in paper] Use a low pass filter to isolate signals < 1 Hz
-			data[i] = SignalHelper.ApplyFirFilter(data[i], LowPassRespirationFilter);
-			
-			double[] fft = SignalHelper.FastFourierTransform(data[i]);
-			int index = SignalHelper.ExtractRate(fft, 8.0, 45.0);
-			if (fft[index] >= maxConfidence) {
-				maxConfidence = fft[index];
-				maxConfidenceFrequency = 60.0 / fft.Length * index;
-				if (debugInfo != null) {
+			int index = SignalHelper.ExtractRate(data[i], 8.0, 45.0);
+			if (data[i][index] >= maxConfidence) {
+				maxConfidence = data[i][index];
+				maxConfidenceFrequency = 60.0 / data[i].Length * index;
+				if (debug) {
 					debugInfo["SelectedICAIndex"] = i; 
-					debugInfo["FFT"] = new Godot.Collections.Array<double>(fft);
+					debugInfo["FFT"] = new Godot.Collections.Array<double>(data[i]);
 				} 
 			}
 		}
 		
-		if (debugInfo != null) {
+		if (debug) {
 			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(data[1]);
 			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(data[2]);
@@ -109,6 +91,23 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		}
 		
 		return maxConfidenceFrequency * 60.0;
+	}
+	
+	private static double[] PreprocessSignal(double[] signal) {
+		// Use a sliding window average to detrend the samples
+		signal = SignalHelper.Detrend(signal, DetrendWindowSize);
+		
+		// Set mean and variance to 0 (z-scoring)
+		SignalHelper.Normalize(signal);
+		
+		//  [not in paper] Use a low pass filter to isolate signals < 1 Hz
+		return SignalHelper.ApplyFirFilter(signal, LowPassRespirationFilter);
+	}
+	
+	private static double[] FrequencyDomain(double[] ica_signal) {
+		// [not in paper] Use a low pass filter to isolate signals < 1 Hz
+		ica_signal = SignalHelper.ApplyFirFilter(ica_signal, LowPassRespirationFilter);
+		return SignalHelper.FastFourierTransform(ica_signal);
 	}
 	
 	private static readonly double[] LowPassRespirationFilter = {

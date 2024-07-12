@@ -4,12 +4,18 @@ extends Node
 # Sample code using the BreathingRateAlgorithm class
 
 func _ready() -> void:
-	var sample_size: int = 2048 + len(Filter.LOW_PASS_RESPIRATION) * 2
+	var sample_size: int = 32 + len(Filter.LOW_PASS_RESPIRATION) * 2
 	var samples: Array[Array] = await %Sampler.get_accelerometer_and_gyroscope_samples(sample_size)
 	
-	var debug_info: Dictionary = {}
-	var breathing_rate: float = BreathingRateAlgorithm.Analyze(samples[0], samples[1], debug_info)
+	var start: int = Time.get_ticks_usec()
+	var breathing_rate: float = BreathingRateAlgorithm.Analyze(samples[0], samples[1], {}, false)
+	var end: int = Time.get_ticks_usec()
 	
+	print((end-start) / 1000000.0)
+	
+	%RateLabel.text = "Breathing Rate: " + str(breathing_rate)
+
+func plot_debug_info(debug_info: Dictionary) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
 	%RawDataZ.plot(debug_info["RawAccelZ"])
@@ -34,4 +40,3 @@ func _ready() -> void:
 	%ICA6.plot(debug_info["ICAOutput5"])
 	
 	%FFT.plot(debug_info["FFT"].slice(0, len(debug_info["FFT"]) / 6))
-	%RateLabel.text = "Breathing Rate: " + str(breathing_rate)
