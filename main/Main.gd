@@ -7,12 +7,12 @@ func _ready() -> void:
 	var sample_size: int = 2048 + len(Filter.LOW_PASS_RESPIRATION) 
 	var samples: Array[Array] = await %Sampler.get_accelerometer_and_gyroscope_samples(sample_size)
 	
-	# var debug_info: Dictionary = {}
+	var debug_info: Dictionary = {}
 	var start: int = Time.get_ticks_usec()
-	var breathing_rate: float = BreathingRateAlgorithm.Analyze(samples[0], samples[1], false, {}, false)
+	var breathing_rate: float = BreathingRateAlgorithm.Analyze(samples[0], samples[1], false, debug_info, true)
 	var end: int = Time.get_ticks_usec()
 	
-	# plot_debug_info(debug_info)
+	plot_debug_info(debug_info)
 	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_rate) + ", Time (s): " + str((end - start) / 1000000.)
 
 func plot_debug_info(debug_info: Dictionary) -> void:
