@@ -74,13 +74,13 @@ public partial class SignalHelper : RefCounted {
 		return output;
 	}
 	
-	public static double[][] TransposeMatrix(double[][] data) {
-		double[][] transposedData = new double[data[0].Length][];
-		for (int i = 0; i < data[0].Length; i++) {
+	public static double[][] TransposeMatrix(double[][] data, int sampleSize) {
+		double[][] transposedData = new double[sampleSize][];
+		for (int i = 0; i < sampleSize; i++) {
 			transposedData[i] = new double[data.Length];
 		}
 		
-		for (int i = 0; i < data[0].Length; i++) {
+		for (int i = 0; i < sampleSize; i++) {
 			for (int j = 0; j < data.Length; j++) {
 				transposedData[i][j] = data[j][i];
 			}
@@ -90,17 +90,17 @@ public partial class SignalHelper : RefCounted {
 	}
 	
 	// Isolates correlated signals into clean possible components
-	public static double[][] IndependentComponentAnalysis(double[][] samples) {
+	public static double[][] IndependentComponentAnalysis(double[][] samples, int sampleSize) {
 		// Accord.NET expects each column to be an input to ICA,
 		// while the rest of this program expects each row
 		// to be a signal
-		double[][] transposedSamples = TransposeMatrix(samples);
+		double[][] transposedSamples = TransposeMatrix(samples, sampleSize);
 		
 		IndependentComponentAnalysis ica = new IndependentComponentAnalysis();
 		MultivariateLinearRegression demix = ica.Learn(transposedSamples);
 		double[][] transposedResult = demix.Transform(transposedSamples);
 		
-		return TransposeMatrix(transposedResult);
+		return TransposeMatrix(transposedResult, 6);
 	}
 	
 	public static double[] FastFourierTransform(double[] signal) {
