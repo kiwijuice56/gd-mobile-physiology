@@ -1,10 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=6 format=3 uid="uid://dsm5pj1lsvevs"]
 
-[ext_resource type="Script" path="res://main/RespirationRateSensor.gd" id="1_8n7nf"]
 [ext_resource type="Script" path="res://main/Main.gd" id="1_65tux"]
 [ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/chart/chart.tscn" id="2_qtway"]
 [ext_resource type="Script" path="res://main/sampler/Sampler.gd" id="2_vkx86"]
-[ext_resource type="Script" path="res://main/HeartRateSensor.gd" id="3_s4if5"]
 
 [sub_resource type="FontFile" id="FontFile_sehcc"]
 subpixel_positioning = 0
@@ -53,14 +51,6 @@ default_font_size = 32
 
 [node name="Main" type="Node"]
 script = ExtResource("1_65tux")
-
-[node name="RespirationRateSensor" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("1_8n7nf")
-
-[node name="HeartRateSensor" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("3_s4if5")
 
 [node name="Sampler" type="Node" parent="."]
 unique_name_in_owner = true
@@ -214,7 +204,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="RespirationRateLabel" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer3"]
+[node name="RateLabel" type="Label" parent="UI/HBoxContainer/GridContainer/ChartContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0

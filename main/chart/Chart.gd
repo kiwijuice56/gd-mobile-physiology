@@ -4,13 +4,13 @@ extends Control
 @export var line_color: Color = Color(0.5, 0.2, 0.9)
 @export var line_width: float = 1.0
 
-var y: PackedFloat64Array
+var y: Array
 
 func _draw() -> void:
 	if len(y) > 0:
 		draw_lines()
 
-func plot(data: PackedFloat64Array) -> void:
+func plot(data: Array) -> void:
 	y = data
 	queue_redraw()
 
