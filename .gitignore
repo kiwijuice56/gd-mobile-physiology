@@ -3,3 +3,5 @@
 *.apk
 *.apk.idsig
 *.tmp
+*.translation
+export_presets.cfg

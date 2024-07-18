@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="gd-mobile-physiology"
-run/main_scene="res://main/main.tscn"
+run/main_scene="res://addons/gd-mobile-physiology/example/main.tscn"
 config/features=PackedStringArray("4.2", "C#", "GL Compatibility")
-config/icon="res://icon.png"
+config/icon="res://addons/gd-mobile-physiology/icons/plugin_icon.png"
 
 [debug]
 
@@ -29,6 +29,10 @@ window/stretch/aspect="keep_height"
 [dotnet]
 
 project/assembly_name="heart-rate-sensor"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gd-mobile-physiology/plugin.cfg")
 
 [network]
 

@@ -1,4 +1,3 @@
-class_name Main
 extends Node
 
 # Sample code using the BreathingRateAlgorithm class

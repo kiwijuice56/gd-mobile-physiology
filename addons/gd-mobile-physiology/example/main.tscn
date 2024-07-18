@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://dsm5pj1lsvevs"]
 
-[ext_resource type="Script" path="res://main/Main.gd" id="1_65tux"]
-[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://main/debug/chart/chart.tscn" id="2_qtway"]
-[ext_resource type="Script" path="res://main/sampling/Sampler.gd" id="2_vkx86"]
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/example/Main.gd" id="1_65tux"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/debug/chart/chart.tscn" id="2_qtway"]
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_vkx86"]
 
 [sub_resource type="FontFile" id="FontFile_sehcc"]
 subpixel_positioning = 0
