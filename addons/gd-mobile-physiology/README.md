@@ -1,10 +1,11 @@
 # gd-mobile-physiology
 
 A library that processes smartphone data into physiological signals, such as heart and respiratory rate.
+Still in development.
 
 ## Usage
 To estimate heart/respiration rate, you must pass an `Array[Vector3]` of accelerometer samples and an `Array[Vector3]` of gyroscope samples into the static `Analyze` function of
-`HeartRateAlgorithm` or `RespirationRateAlgorithm`:
+`HeartRateAlgorithm` or `RespirationRateAlgorithm`.
 
 Each item in each of the `Array[Vector3]` objects should be a measurement of the `get_accelerometer` and `get_gyroscope` methods from `Input`,
 with a sampling rate of 60 Hz (once per physics process frame). See `addons/gd-mobile-physiology/sampling/Sampler.gd`
@@ -20,7 +21,7 @@ The `debug` parameter will enable logging of intermediate signals during analysi
 If `true`, the `debug_info` `Dictionary` that was passed in will be filled with labeled `String : Array[float]` pairs. Note that the `debug_info` 
 `Dictionary` must be passed in regardless of whether `debug` is true or not.
 
-## Example usage
+## Example Script
 See `addons/gd-mobile-physiology/example/Main.gd` for the full example script.
 
 ```python
