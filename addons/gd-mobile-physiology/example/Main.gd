@@ -3,18 +3,38 @@ extends Node
 # Sample code using the BreathingRateAlgorithm class
 
 func _ready() -> void:
-	var sample_size: int = 2048 + len(Filter.LOW_PASS_RESPIRATION) 
-	var samples: Array[Array] = await %Sampler.get_accelerometer_and_gyroscope_samples(sample_size)
+	test_heart_rate(2048)
+
+func test_heart_rate(sample_size: int) -> void:
+	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
+	
+	# Array of Array[Vector3] (accelerometer and gyroscope samples, respectively)
+	var samples: Array[Array] = await %Sampler.get_accelerometer_and_gyroscope_samples(actual_sample_size)
+	var accelerometer: Array[Vector3] = samples[0]
+	var gyroscope: Array[Vector3] = samples[1]
 	
 	var debug_info: Dictionary = {}
-	var start: int = Time.get_ticks_usec()
-	var breathing_rate: float = BreathingRateAlgorithm.Analyze(samples[0], samples[1], false, debug_info, true)
-	var end: int = Time.get_ticks_usec()
+	var heart_rate_bpm: float = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
 	
-	plot_debug_info(debug_info)
-	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_rate) + ", Time (s): " + str((end - start) / 1000000.)
+	plot_debug_info(debug_info, false)
+	%RateLabel.text = "Heart Rate (bpm): " + str(heart_rate_bpm) 
 
-func plot_debug_info(debug_info: Dictionary) -> void:
+func test_breathing_rate(sample_size: int) -> void:
+	var actual_sample_size: int = BreathingRateAlgorithm.GetActualSampleSize(sample_size)
+	
+	# Array of Array[Vector3] (accelerometer and gyroscope samples, respectively)
+	var samples: Array[Array] = await %Sampler.get_accelerometer_and_gyroscope_samples(actual_sample_size)
+	var accelerometer: Array[Vector3] = samples[0]
+	var gyroscope: Array[Vector3] = samples[1]
+	
+	var debug_info: Dictionary = {}
+	var breathing_rate_bpm: float = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	
+	plot_debug_info(debug_info, true)
+	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_rate_bpm)
+
+
+func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
 	%RawDataZ.plot(debug_info["RawAccelZ"])
@@ -29,13 +49,26 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 	%FixedDataY2.plot(debug_info["PreprocessedGyroY"])
 	%FixedDataZ2.plot(debug_info["PreprocessedGyroZ"])
 	
-	get_node("%ICA" + str(1 + debug_info["SelectedICAIndex"])).line_color = Color.RED
-	
-	%ICA1.plot(debug_info["ICAOutput0"])
-	%ICA2.plot(debug_info["ICAOutput1"])
-	%ICA3.plot(debug_info["ICAOutput2"])
-	%ICA4.plot(debug_info["ICAOutput3"])
-	%ICA5.plot(debug_info["ICAOutput4"])
-	%ICA6.plot(debug_info["ICAOutput5"])
+	# Heart/respiration plot differently for the bottom left graph
+	if has_ica:
+		%ICATitle.text = "ICA Output"
+		
+		get_node("%ICA" + str(1 + debug_info["SelectedICAIndex"])).line_color = Color.RED
+		
+		%ICA1.plot(debug_info["ICAOutput0"])
+		%ICA2.plot(debug_info["ICAOutput1"])
+		%ICA3.plot(debug_info["ICAOutput2"])
+		%ICA4.plot(debug_info["ICAOutput3"])
+		%ICA5.plot(debug_info["ICAOutput4"])
+		%ICA6.plot(debug_info["ICAOutput5"])
+	else:
+		%ICATitle.text = "Combined Signal"
+		
+		%ICA1.plot(debug_info["CombinedSignal"])
+		%ICA2.visible = false
+		%ICA3.visible = false
+		%ICA4.visible = false
+		%ICA5.visible = false
+		%ICA6.visible = false
 	
 	%FFT.plot(debug_info["FFT"].slice(0, len(debug_info["FFT"]) / 6))

@@ -103,14 +103,14 @@ public partial class SignalHelper : RefCounted {
 		return TransposeMatrix(transposedResult, 6);
 	}
 	
-	public static double[] FastFourierTransform(double[] signal) {
-		double[] realComponent = new double[signal.Length];
-		double[] complexComponent = new double[signal.Length];
-		signal.CopyTo(realComponent, 0);
+	public static double[] FastFourierTransform(double[] signal, int sampleSize) {
+		double[] realComponent = new double[sampleSize];
+		double[] complexComponent = new double[sampleSize];
+		Array.Copy(signal, 0, realComponent, 0, sampleSize);
 		
 		FourierTransform2.FFT(realComponent, complexComponent, FourierTransform.Direction.Forward);
 		
-		for (int i = 0; i < signal.Length; i++) {
+		for (int i = 0; i < sampleSize; i++) {
 			realComponent[i] = Math.Sqrt(realComponent[i] * realComponent[i] + complexComponent[i] * complexComponent[i]);
 		}
 		

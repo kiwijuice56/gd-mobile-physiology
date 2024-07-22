@@ -43,10 +43,11 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["RawGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
+		// Note: Signal will have extraneous samples at the end due to FIR filtering.
+		// These are removed as the array is recreated in the ICA step
 		if (parallel) {
-			Parallel.For(0, 6, delegate(int i)
-			{
-				 PreprocessSignal(data[i]);
+			Parallel.For(0, 6, delegate(int i) {
+				PreprocessSignal(data[i]);
 			});
 		} else {
 			for (int i = 0; i < 6; i++) {
@@ -77,13 +78,12 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		
 		// Run FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
 		if (parallel) {
-			Parallel.For(0, 6, delegate(int i)
-			{
-				FrequencyDomain(data[i]);
+			Parallel.For(0, 6, delegate(int i) {
+				data[i] = SignalHelper.FastFourierTransform(data[i], data[i].Length);
 			});
 		} else {
 			for (int i = 0; i < 6; i++) {
-				FrequencyDomain(data[i]);
+				data[i] = SignalHelper.FastFourierTransform(data[i], data[i].Length);
 			}
 		}
 		
@@ -122,11 +122,15 @@ public partial class BreathingRateAlgorithm : GodotObject {
 	}
 	
 	private static void FrequencyDomain(double[] ica_signal) {
-		double[] fft = SignalHelper.FastFourierTransform(ica_signal);
+		double[] fft = SignalHelper.FastFourierTransform(ica_signal, ica_signal.Length);
 		fft.CopyTo(ica_signal, 0);
 	}
 	
-	private static readonly double[] LowPassRespirationFilter = {
+	public static int GetActualSampleSize(int outputSampleSize) {
+		return outputSampleSize + LowPassRespirationFilter.Length;
+	}
+	
+	public static readonly double[] LowPassRespirationFilter = {
 	  -0.0045644380812448395,
 	  -0.00042392147736656203,
 	  -0.00039921600949020575,

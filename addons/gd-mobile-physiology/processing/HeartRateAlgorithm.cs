@@ -43,10 +43,11 @@ public partial class HeartRateAlgorithm : GodotObject {
 			debugInfo["RawGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
+		// Note: Signal will have extraneous samples at the end due to FIR filtering.
+		// These are removed as the array is recreated in the FFT step
 		if (parallel) {
-			Parallel.For(0, 6, delegate(int i)
-			{
-				 PreprocessSignal(data[i]);
+			Parallel.For(0, 6, delegate(int i) {
+				PreprocessSignal(data[i]);
 			});
 		} else {
 			for (int i = 0; i < 6; i++) {
@@ -63,48 +64,31 @@ public partial class HeartRateAlgorithm : GodotObject {
 			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
-		// Run ICA (using external C# Accord library) 
-		data = SignalHelper.IndependentComponentAnalysis(data, sampleSize - LowPassRespirationFilter.Length);
-		
-		if (debug) {
-			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(data[0]);
-			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(data[1]);
-			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(data[2]);
-			debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(data[3]);
-			debugInfo["ICAOutput4"] = new Godot.Collections.Array<double>(data[4]);
-			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(data[5]);
-		}
-		
-		// Run FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
-		if (parallel) {
-			Parallel.For(0, 6, delegate(int i)
-			{
-				FrequencyDomain(data[i]);
-			});
-		} else {
-			for (int i = 0; i < 6; i++) {
-				FrequencyDomain(data[i]);
+		// Aggregate all signals into one
+		for (int i = 0; i < sampleSize - BallistocardiographyFilter.Length; i++) {
+			double sum = 0;
+			for (int j = 0; j < 6; j++) {
+				sum += data[j][i] * data[j][i];
 			}
+			data[0][i] = Math.Sqrt(sum); 
 		}
 		
+		double[] combinedSignal = SignalHelper.ApplyFirFilter(data[0], BandpassHeartRateFilter);
+		
 		if (debug) {
-			debugInfo["SelectedICAIndex"] = 0; 
-			debugInfo["FFT"] = new Godot.Collections.Array<double>();
+			debugInfo["CombinedSignal"] = new Godot.Collections.Array<double>(combinedSignal);
+		}
+		
+		// Run FFT (using external C# Accord library) 
+		double[] fft = SignalHelper.FastFourierTransform(combinedSignal, sampleSize - (BandpassHeartRateFilter.Length + BallistocardiographyFilter.Length));
+		
+		if (debug) {
+			debugInfo["FFT"] = new Godot.Collections.Array<double>(fft);
 		} 
 		
-		double maxConfidence = 0.0;
-		double maxConfidenceFrequency = 0.0;
-		for (int i = 0; i < 6; i++) {
-			int index = SignalHelper.ExtractRate(data[i], 8.0, 45.0);
-			if (data[i][index] >= maxConfidence) {
-				maxConfidence = data[i][index];
-				maxConfidenceFrequency = 60.0 / data[i].Length * index;
-				if (debug) {
-					debugInfo["SelectedICAIndex"] = i; 
-					debugInfo["FFT"] = new Godot.Collections.Array<double>(data[i]);
-				} 
-			}
-		}
+		int index = SignalHelper.ExtractRate(fft, 40, 150);
+		
+		double maxConfidenceFrequency = 60.0 / fft.Length * index;
 		
 		return maxConfidenceFrequency * 60.0;
 	}
@@ -116,17 +100,16 @@ public partial class HeartRateAlgorithm : GodotObject {
 		// Set mean and variance to 0 (z-scoring)
 		SignalHelper.Normalize(detrendedSignal);
 		
-		//  [not in paper] Use a low pass filter to isolate signals < 1 Hz
-		double[] filteredSignal = SignalHelper.ApplyFirFilter(detrendedSignal, LowPassRespirationFilter);
+		// Isolate signals realted to BCG movements
+		double[] filteredSignal = SignalHelper.ApplyFirFilter(detrendedSignal, BallistocardiographyFilter);
 		filteredSignal.CopyTo(signal, 0);
 	}
 	
-	private static void FrequencyDomain(double[] ica_signal) {
-		double[] fft = SignalHelper.FastFourierTransform(ica_signal);
-		fft.CopyTo(ica_signal, 0);
+	public static int GetActualSampleSize(int outputSampleSize) {
+		return outputSampleSize + BallistocardiographyFilter.Length + BandpassHeartRateFilter.Length;
 	}
 	
-	private static readonly double[] BallistocardiographyFilter = {
+	public static readonly double[] BallistocardiographyFilter = {
 	  0.011242603325458032,
 	  0.005157445306135791,
 	  -0.020243957295231565,
@@ -190,7 +173,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 	  0.011242603325458032
 	};
 	
-	private static readonly double[] BandpassFilterHeartRate = {
+	public static readonly double[] BandpassHeartRateFilter = {
 	-0.006650726180051685,
 	-0.003716190467484666,
 	-0.004510744296719715,

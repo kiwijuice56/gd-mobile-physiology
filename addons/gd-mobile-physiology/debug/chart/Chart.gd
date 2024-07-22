@@ -13,6 +13,7 @@ func _draw() -> void:
 		draw_lines()
 
 func plot(data: Array) -> void:
+	visible = true
 	y = PackedFloat64Array(data)
 	queue_redraw()
 
