@@ -7,7 +7,6 @@ var accelerometer: Array[Vector3]
 var gyroscope: Array[Vector3]
 
 var sample_amount_target: int 
-var frame: int = 0
 
 signal sampling_complete
 

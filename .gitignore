@@ -5,3 +5,4 @@
 *.tmp
 *.translation
 export_presets.cfg
+*.sln
