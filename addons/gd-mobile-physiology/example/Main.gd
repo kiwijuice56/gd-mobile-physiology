@@ -3,7 +3,7 @@ extends Node
 # Sample code using the BreathingRateAlgorithm class
 
 func _ready() -> void:
-	test_breathing_rate(2048)
+	test_breathing_rate(16)
 
 func test_heart_rate(sample_size: int) -> void:
 	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)

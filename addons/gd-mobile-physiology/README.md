@@ -6,9 +6,9 @@ A library that processes smartphone data into physiological signals, such as hea
 Note: This project requires the Mono version of Godot (last tested on version `4.2.2.stable.mono`).
 1) Copy the `addons/gd-mobile-physiology/` folder into your project's `addons` folder.
 2) Include the `Accord.NET` dependency in your build settings:
-    - (If your project DOES NOT have a `.csproj` file): Copy `heart-rate-sensor.csproj` from the download folder
+	- (If your project DOES NOT have a `.csproj` file): Copy `heart-rate-sensor.csproj` from the download folder
 into the root of your project. Update `dotnet/project/assembly_name` in Project Settings to `heart-rate-sensor` and reload the project.
-    - (If your project DOES have a `.csproj` file): Add the following dependency into the `Project` block of your `.csproj` file:
+	- (If your project DOES have a `.csproj` file): Add the following dependency into the `Project` block of your `.csproj` file:
 ```
 <ItemGroup>
 	<PackageReference Include="Accord" Version="3.8.0" />
