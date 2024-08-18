@@ -3,10 +3,10 @@
 A library that processes smartphone data into physiological signals, such as heart and breathing rate.
 
 ## Installation
-Note: This project requires the Mono version of Godot (last tested on version `4.2.2.stable.mono`).
+Note: This project requires the Mono version of Godot (last tested on version `4.3.stable.mono`).
 1) Copy the `addons/gd-mobile-physiology/` folder into your project's `addons` folder.
 2) Include the `Accord.NET` dependency in your build settings:
-	- (If your project DOES NOT have a `.csproj` file): Copy `heart-rate-sensor.csproj` from the download folder
+	- (If your project DOES NOT have a `.csproj` file): Copy the `heart-rate-sensor.csproj` and `heart-rate-sensor.sln` files from the download folder
 into the root of your project. Update `dotnet/project/assembly_name` in Project Settings to `heart-rate-sensor` and reload the project.
 	- (If your project DOES have a `.csproj` file): Add the following dependency into the `Project` block of your `.csproj` file:
 ```
@@ -20,6 +20,10 @@ into the root of your project. Update `dotnet/project/assembly_name` in Project 
 ## Usage
 To estimate heart/respiration rate, you must pass an `Array[Vector3]` of accelerometer samples and an `Array[Vector3]` of gyroscope samples into the static `Analyze` function of
 `HeartRateAlgorithm` or `RespirationRateAlgorithm`.
+
+Both methods return a dictionary with the following entries:
+- `rate`: Estimated breathing rate in beats per minute.
+- `magnitude`: The strength of the given rate in the frequency domain. This range of this value varies based on sample size, but you can test this value to filter out bad readings. Generally, the lower the magnitude, the weaker the signal.
 
 Each item in each of the `Array[Vector3]` objects should be a measurement of the `get_accelerometer` and `get_gyroscope` methods from `Input`,
 with a sampling rate of 60 Hz (once per physics process frame). See `addons/gd-mobile-physiology/sampling/Sampler.gd`
@@ -47,9 +51,8 @@ func test_heart_rate(sample_size: int) -> void:
 	var accelerometer: Array[Vector3] = samples[0]
 	var gyroscope: Array[Vector3] = samples[1]
 
-	var debug_info: Dictionary = {}
-	var heart_rate_bpm: float = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	var debug_info: Dictionary = {} # Includes advanced debugging info; see code for details.
+	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
 
-	print(heart_rate_bpm)
-	print(debug_info)
+	print("heart rate (bpm): ", heart_data["rate"])
 ```

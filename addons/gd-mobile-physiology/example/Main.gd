@@ -3,7 +3,7 @@ extends Node
 # Sample code using the BreathingRateAlgorithm class
 
 func _ready() -> void:
-	test_breathing_rate(16)
+	test_breathing_rate(2048)
 
 func test_heart_rate(sample_size: int) -> void:
 	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
@@ -14,10 +14,11 @@ func test_heart_rate(sample_size: int) -> void:
 	var gyroscope: Array[Vector3] = samples[1]
 	
 	var debug_info: Dictionary = {}
-	var heart_rate_bpm: float = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	print(heart_data)
 	
 	plot_debug_info(debug_info, false)
-	%RateLabel.text = "Heart Rate (bpm): " + str(heart_rate_bpm) 
+	%RateLabel.text = "Heart Rate (bpm): " + str(heart_data["rate"]) 
 
 func test_breathing_rate(sample_size: int) -> void:
 	var actual_sample_size: int = BreathingRateAlgorithm.GetActualSampleSize(sample_size)
@@ -28,10 +29,11 @@ func test_breathing_rate(sample_size: int) -> void:
 	var gyroscope: Array[Vector3] = samples[1]
 	
 	var debug_info: Dictionary = {}
-	var breathing_rate_bpm: float = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
+	print(breathing_data)
 	
 	plot_debug_info(debug_info, true)
-	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_rate_bpm)
+	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_data["rate"])
 
 
 func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:

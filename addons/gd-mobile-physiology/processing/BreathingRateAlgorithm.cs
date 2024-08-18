@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 public partial class BreathingRateAlgorithm : GodotObject {
 	private const int DetrendWindowSize = 128;
 	
-	// Accepts accelerometer and gyroscope samples and returns an estimated breathing rate in beats per minute.
+	// Accepts accelerometer and gyroscope samples and returns a dictionary with the entries:
+	// - "rate": Estimated breathing rate in beats per minute.
+	// - "magnitude": The strength of the given rate in the frequency domain. This value varies based on sample size, but you can use this value to filter out noise/bad readings. Generally, the lower the magnitude, the weaker the signal.
 	// Algorithm modified from `BioPhone: Physiology Monitoring from Peripheral Smartphone Motions: Javier Hernandez, Daniel J. McDuff and Rosalind W. Picard.`
 	// If `debug` is true, `debugInfo` will be filled with the following items:
 	// - Raw[Accel/Gyro][X/Y/Z]: Signals before any processing
@@ -17,7 +19,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 	// - ICAOutput[0/1/2/3/4/5]: Output of independent component analysis in random order
 	// - SelectedICAIndex: The ICA signal that was used for determining breathing rate
 	// - FFT: The Fourier transform for the selected ICA signal
-	public static double Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, bool parallel, Godot.Collections.Dictionary debugInfo, bool debug) {
+	public static Godot.Collections.Dictionary Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, bool parallel, Godot.Collections.Dictionary debugInfo, bool debug) {
 		int sampleSize = accel.Count;
 		
 		// Load data into arrays
@@ -105,8 +107,11 @@ public partial class BreathingRateAlgorithm : GodotObject {
 				} 
 			}
 		}
-		
-		return maxConfidenceFrequency * 60.0;
+		return new Godot.Collections.Dictionary
+		{
+			{"rate", maxConfidenceFrequency * 60.0},
+			{"magnitude", maxConfidence},
+		};
 	}
 	
 	private static void PreprocessSignal(double[] signal) {
