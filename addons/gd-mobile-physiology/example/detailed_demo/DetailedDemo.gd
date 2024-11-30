@@ -1,6 +1,9 @@
 extends Node
 
-# Sample code using the BreathingRateAlgorithm class
+# Sample code using the BreathingRateAlgorithm and HeartRateAlgorithm classes
+# Plots all steps of the data process
+
+# You may need to resize the window to get the charts to appear correctly
 
 func _ready() -> void:
 	test_breathing_rate(2048)
@@ -34,7 +37,6 @@ func test_breathing_rate(sample_size: int) -> void:
 	
 	plot_debug_info(debug_info, true)
 	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_data["rate"])
-
 
 func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])

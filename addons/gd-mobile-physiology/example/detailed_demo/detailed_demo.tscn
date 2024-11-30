@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://dsm5pj1lsvevs"]
 
-[ext_resource type="Script" path="res://addons/gd-mobile-physiology/example/Main.gd" id="1_65tux"]
-[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/debug/chart/chart.tscn" id="2_qtway"]
-[ext_resource type="Script" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_vkx86"]
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/example/detailed_demo/DetailedDemo.gd" id="1_0k44g"]
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_834jg"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/debug/chart/chart.tscn" id="3_xg04p"]
 
 [sub_resource type="FontFile" id="FontFile_sehcc"]
 subpixel_positioning = 0
@@ -49,12 +49,12 @@ cache/0/20/0/kerning_overrides/20/0 = Vector2(0, 0)
 default_font = SubResource("FontFile_sehcc")
 default_font_size = 32
 
-[node name="Main" type="Node"]
-script = ExtResource("1_65tux")
+[node name="DetailedDemo" type="Node"]
+script = ExtResource("1_0k44g")
 
 [node name="Sampler" type="Node" parent="."]
 unique_name_in_owner = true
-script = ExtResource("2_vkx86")
+script = ExtResource("2_834jg")
 
 [node name="UI" type="MarginContainer" parent="."]
 anchors_preset = 15
@@ -91,32 +91,32 @@ size_flags_vertical = 3
 layout_mode = 2
 text = "Raw Data (x, y, z accelerometer + gyro readings)"
 
-[node name="RawDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="RawDataY" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataY" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="RawDataZ" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataZ" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="RawDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="RawDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="RawDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("2_qtway")]
+[node name="RawDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
@@ -130,32 +130,32 @@ size_flags_vertical = 3
 layout_mode = 2
 text = "Detrended, Z-Scored, and Filtered Data"
 
-[node name="FixedDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataX" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="FixedDataY" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataY" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="FixedDataZ" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataZ" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="FixedDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataX2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="FixedDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataY2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="FixedDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("2_qtway")]
+[node name="FixedDataZ2" parent="UI/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
@@ -170,32 +170,32 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "ICA Output"
 
-[node name="ICA1" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA1" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="ICA2" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA2" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA3" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA3" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA4" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA4" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="ICA5" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA5" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA6" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("2_qtway")]
+[node name="ICA6" parent="UI/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
@@ -212,7 +212,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Respiration Rate:"
 
-[node name="FFT" parent="UI/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("2_qtway")]
+[node name="FFT" parent="UI/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)

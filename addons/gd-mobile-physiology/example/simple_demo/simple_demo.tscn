@@ -1,0 +1,185 @@
+[gd_scene load_steps=14 format=3 uid="uid://dj4c72sakqi2e"]
+
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/example/simple_demo/SimpleDemo.gd" id="1_ct3qp"]
+[ext_resource type="Script" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_j23br"]
+[ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/simple_demo/poppins.ttf" id="3_2npcv"]
+[ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/simple_demo/heart.png" id="3_l1diu"]
+[ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/simple_demo/lung.png" id="4_ngc2e"]
+
+[sub_resource type="FontVariation" id="FontVariation_tmh1g"]
+base_font = ExtResource("3_2npcv")
+
+[sub_resource type="Theme" id="Theme_3our0"]
+default_font = SubResource("FontVariation_tmh1g")
+
+[sub_resource type="Gradient" id="Gradient_ptoos"]
+interpolation_color_space = 2
+colors = PackedColorArray(0.163717, 0.162783, 0.219879, 1, 0.435533, 0.4324, 0.47, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jygmv"]
+gradient = SubResource("Gradient_ptoos")
+width = 1
+height = 1024
+fill_from = Vector2(0.528455, 1)
+fill_to = Vector2(0.504065, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tk5ej"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.117647, 0.113725, 0.160784, 0.678431)
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mp7hg"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.156908, 0.1539, 0.19, 0.831373)
+border_width_bottom = 4
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6mtfg"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(0.117647, 0.113725, 0.160784, 0.678431)
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qoakl"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.156908, 0.1539, 0.19, 0.831373)
+border_width_bottom = 4
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[node name="SimpleDemo" type="Node"]
+script = ExtResource("1_ct3qp")
+
+[node name="Sampler" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_j23br")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_3our0")
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer"]
+layout_mode = 2
+texture = SubResource("GradientTexture2D_jygmv")
+
+[node name="RecordingCover" type="ColorRect" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+color = Color(0.61, 0.0732, 0.440013, 0.113725)
+
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer"]
+layout_mode = 2
+split_offset = 200
+dragger_visibility = 2
+
+[node name="DataContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
+[node name="HeartContainer" type="HBoxContainer" parent="MarginContainer/VSplitContainer/DataContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeartIcon" type="TextureRect" parent="MarginContainer/VSplitContainer/DataContainer/HeartContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("3_l1diu")
+stretch_mode = 2
+
+[node name="HRLabel" type="Label" parent="MarginContainer/VSplitContainer/DataContainer/HeartContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 128
+text = "-"
+
+[node name="BreathingContainer" type="HBoxContainer" parent="MarginContainer/VSplitContainer/DataContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LungIcon" type="TextureRect" parent="MarginContainer/VSplitContainer/DataContainer/BreathingContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("4_ngc2e")
+stretch_mode = 2
+
+[node name="BRLabel" type="Label" parent="MarginContainer/VSplitContainer/DataContainer/BreathingContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 128
+text = "-"
+
+[node name="BPM" type="Label" parent="MarginContainer/VSplitContainer/DataContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "(bpm)"
+
+[node name="ButtonContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="RecordButton" type="Button" parent="MarginContainer/VSplitContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mp7hg")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Start measuring"
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VSplitContainer/ButtonContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+max_value = 1.0
+step = 0.001
+show_percentage = false

@@ -22,6 +22,8 @@ func _physics_process(_delta: float) -> void:
 		stop_detection()
 
 func start_detection() -> void:
+	accelerometer.clear()
+	gyroscope.clear()
 	set_physics_process(true)
 
 func stop_detection() -> void:
