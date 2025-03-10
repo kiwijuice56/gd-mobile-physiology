@@ -27,6 +27,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		for (int i = 0; i < 6; i++) {
 			data[i] = new double[sampleSize];
 		}
+		
 		for (int i = 0; i < sampleSize; i++) {
 			data[0][i] = accel[i].X;
 			data[1][i] = accel[i].Y;
@@ -34,6 +35,12 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			data[3][i] = gyro[i].X;
 			data[4][i] = gyro[i].Y;
 			data[5][i] = gyro[i].Z;
+		}
+		
+		// Check if gyroscope is completely 0
+		bool gyroInvalid = true;
+		for (int i = 0; i < sampleSize; i++) {
+			gyroInvalid = gyroInvalid && (data[3][i] == 0 && data[4][i] == 0 && data[5][i] == 0);
 		}
 		
 		if (debug) {
@@ -66,25 +73,26 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
+		
 		// Run ICA (using external C# Accord library) 
-		data = SignalHelper.IndependentComponentAnalysis(data, sampleSize - LowPassRespirationFilter.Length);
+		data = SignalHelper.IndependentComponentAnalysis(data, gyroInvalid ? 3 : 6, sampleSize - LowPassRespirationFilter.Length);
 		
 		if (debug) {
 			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(data[1]);
 			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(data[2]);
-			debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(data[3]);
+			/*debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(data[3]);
 			debugInfo["ICAOutput4"] = new Godot.Collections.Array<double>(data[4]);
-			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(data[5]);
+			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(data[5]);*/
 		}
 		
 		// Run FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges
 		if (parallel) {
-			Parallel.For(0, 6, delegate(int i) {
+			Parallel.For(0, gyroInvalid ? 3 : 6, delegate(int i) {
 				data[i] = SignalHelper.FastFourierTransform(data[i], data[i].Length);
 			});
 		} else {
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < (gyroInvalid ? 3 : 6); i++) {
 				data[i] = SignalHelper.FastFourierTransform(data[i], data[i].Length);
 			}
 		}
@@ -96,7 +104,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		
 		double maxConfidence = 0.0;
 		double maxConfidenceFrequency = 0.0;
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < (gyroInvalid ? 3 : 6); i++) {
 			int index = SignalHelper.ExtractRate(data[i], 8.0, 45.0);
 			if (data[i][index] >= maxConfidence) {
 				maxConfidence = data[i][index];

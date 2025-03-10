@@ -56,7 +56,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 				PreprocessSignal(data[i]);
 			}
 		}
-		
+				
 		if (debug) {
 			debugInfo["PreprocessedAccelX"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["PreprocessedAccelY"] = new Godot.Collections.Array<double>(data[1]);

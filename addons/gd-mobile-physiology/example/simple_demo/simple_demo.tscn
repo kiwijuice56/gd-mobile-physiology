@@ -1,7 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://dj4c72sakqi2e"]
+[gd_scene load_steps=13 format=3 uid="uid://dj4c72sakqi2e"]
 
-[ext_resource type="Script" path="res://addons/gd-mobile-physiology/example/simple_demo/SimpleDemo.gd" id="1_ct3qp"]
-[ext_resource type="Script" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_j23br"]
+[ext_resource type="Script" uid="uid://dflk2i71j5so6" path="res://addons/gd-mobile-physiology/example/simple_demo/SimpleDemo.gd" id="1_ct3qp"]
+[ext_resource type="Script" uid="uid://oyt3o8h3pgxm" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_j23br"]
 [ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/simple_demo/poppins.ttf" id="3_2npcv"]
 [ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/simple_demo/heart.png" id="3_l1diu"]
 [ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/simple_demo/lung.png" id="4_ngc2e"]
@@ -36,14 +36,14 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 anti_aliasing = false
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mp7hg"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qoakl"]
 content_margin_left = 16.0
 content_margin_top = 16.0
 content_margin_right = 16.0
 content_margin_bottom = 16.0
-bg_color = Color(0.156908, 0.1539, 0.19, 0.831373)
-border_width_bottom = 4
-border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+bg_color = Color(0.19205, 0.1886, 0.23, 0.878431)
+border_width_bottom = 6
+border_color = Color(0.0761467, 0.0738692, 0.107939, 0.678431)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
@@ -56,20 +56,6 @@ content_margin_top = 16.0
 content_margin_right = 16.0
 content_margin_bottom = 12.0
 bg_color = Color(0.117647, 0.113725, 0.160784, 0.678431)
-border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qoakl"]
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(0.156908, 0.1539, 0.19, 0.831373)
-border_width_bottom = 4
 border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
@@ -103,13 +89,14 @@ color = Color(0.61, 0.0732, 0.440013, 0.113725)
 
 [node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer"]
 layout_mode = 2
-split_offset = 200
+split_offset = 160
 dragger_visibility = 2
 
 [node name="DataContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
+theme_override_constants/separation = 16
 
 [node name="HeartContainer" type="HBoxContainer" parent="MarginContainer/VSplitContainer/DataContainer"]
 layout_mode = 2
@@ -153,16 +140,20 @@ text = "-"
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 24
 text = "(bpm)"
 
-[node name="ButtonContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer"]
+[node name="InputContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 32
 
-[node name="RecordButton" type="Button" parent="MarginContainer/VSplitContainer/ButtonContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VSplitContainer/InputContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="RecordButton" type="Button" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -171,15 +162,47 @@ size_flags_vertical = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 32
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mp7hg")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
 text = "Start measuring"
 
-[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VSplitContainer/ButtonContainer"]
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer2"]
 unique_name_in_owner = true
-visible = false
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
 max_value = 1.0
 step = 0.001
 show_percentage = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VSplitContainer/InputContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Measurement length (seconds)"
+
+[node name="LengthSlider" type="HSlider" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 15.0
+max_value = 120.0
+step = 15.0
+value = 30.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Min" type="Label" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "15"
+
+[node name="Max" type="Label" parent="MarginContainer/VSplitContainer/InputContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "120"

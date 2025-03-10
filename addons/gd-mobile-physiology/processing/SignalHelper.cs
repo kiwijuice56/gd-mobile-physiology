@@ -56,7 +56,11 @@ public partial class SignalHelper : RefCounted {
 		double stdev = StandardDeviation(sample);
 		for (int i = 0; i < sample.Length; i++) {
 			sample[i] -= average;
-			sample[i] /= stdev;
+			
+			// Prevents samples from blowing up or becoming NaN
+			if (stdev > 0.01) {
+				sample[i] /= stdev;
+			}
 		}
 	} 
 	
@@ -74,14 +78,14 @@ public partial class SignalHelper : RefCounted {
 		return output;
 	}
 	
-	public static double[][] TransposeMatrix(double[][] data, int sampleSize) {
-		double[][] transposedData = new double[sampleSize][];
-		for (int i = 0; i < sampleSize; i++) {
-			transposedData[i] = new double[data.Length];
+	public static double[][] TransposeMatrix(double[][] data, int n, int m) {
+		double[][] transposedData = new double[m][];
+		for (int i = 0; i < m; i++) {
+			transposedData[i] = new double[n];
 		}
 		
-		for (int i = 0; i < sampleSize; i++) {
-			for (int j = 0; j < data.Length; j++) {
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
 				transposedData[i][j] = data[j][i];
 			}
 		}
@@ -90,17 +94,17 @@ public partial class SignalHelper : RefCounted {
 	}
 	
 	// Isolates correlated signals into clean possible components
-	public static double[][] IndependentComponentAnalysis(double[][] samples, int sampleSize) {
+	public static double[][] IndependentComponentAnalysis(double[][] samples, int signalCount, int sampleSize) {
 		// Accord.NET expects each column to be an input to ICA,
 		// while the rest of this program expects each row
 		// to be a signal
-		double[][] transposedSamples = TransposeMatrix(samples, sampleSize);
+		double[][] transposedSamples = TransposeMatrix(samples, signalCount, sampleSize);
 		
 		IndependentComponentAnalysis ica = new IndependentComponentAnalysis();
 		MultivariateLinearRegression demix = ica.Learn(transposedSamples);
 		double[][] transposedResult = demix.Transform(transposedSamples);
 		
-		return TransposeMatrix(transposedResult, 6);
+		return TransposeMatrix(transposedResult, transposedSamples.Length, transposedSamples[0].Length);
 	}
 	
 	public static double[] FastFourierTransform(double[] signal, int sampleSize) {
