@@ -35,12 +35,13 @@ func _on_record() -> void:
 	var accelerometer: Array[Vector3] = samples[0]
 	var gyroscope: Array[Vector3] = samples[1] 
 	
-	var debug: Dictionary = {}
-	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer.slice(0, heart_sample_size), gyroscope.slice(0, heart_sample_size), false, {}, true)
+	var debug_heart: Dictionary = {}
+	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer.slice(0, heart_sample_size), gyroscope.slice(0, heart_sample_size), false, debug_heart, true)
 	
-	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer.slice(0, breath_sample_size), gyroscope.slice(0, breath_sample_size), false, debug, true)
+	var debug_breathing: Dictionary = {}
+	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer.slice(0, breath_sample_size), gyroscope.slice(0, breath_sample_size), false, debug_breathing, true)
 	
-	print(debug)
+	print(heart_data["confidence"])
 	
 	%HRLabel.text = str(int(heart_data["rate"]))
 	%BRLabel.text = str(int(breathing_data["rate"]))

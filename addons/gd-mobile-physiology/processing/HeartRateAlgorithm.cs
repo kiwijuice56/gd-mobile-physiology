@@ -83,19 +83,32 @@ public partial class HeartRateAlgorithm : GodotObject {
 		
 		// Run FFT (using external C# Accord library) 
 		double[] fft = SignalHelper.FastFourierTransform(combinedSignal, sampleSize - (BandpassHeartRateFilter.Length + BallistocardiographyFilter.Length));
+		double[] probabilityDistribution = SignalHelper.SoftMax(fft, 60, 120);
+		int index = SignalHelper.ExtractRate(fft, 60, 120);
+		
+		double confidenceSum = 0;
+		double frequencySum = 0;
+		int included = 0;
+		for (int i = index - 2; i <= index + 2; i++) {
+			if (i < 0 || i >= probabilityDistribution.Length) {
+				continue;
+			}
+			included++;
+			frequencySum += 60.0 / fft.Length * i;
+			confidenceSum += probabilityDistribution[i];
+		}
+		
+		double frequencyAverage = frequencySum / included;
 		
 		if (debug) {
 			debugInfo["FFT"] = new Godot.Collections.Array<double>(fft);
+			debugInfo["ProbabilityDistribution"] = probabilityDistribution;
 		} 
-		
-		int index = SignalHelper.ExtractRate(fft, 40, 150);
-		
-		double maxConfidenceFrequency = 60.0 / fft.Length * index;
 		
 		return new Godot.Collections.Dictionary
 		{
-			{"rate", maxConfidenceFrequency * 60.0},
-			{"magnitude", fft[index]},
+			{"rate", frequencyAverage * 60.0},
+			{"confidence", confidenceSum},
 		};
 	}
 	

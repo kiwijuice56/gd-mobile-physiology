@@ -6,7 +6,10 @@ extends Node
 # You may need to resize the window to get the charts to appear correctly
 
 func _ready() -> void:
-	test_breathing_rate(2048)
+	%Start.pressed.connect(_on_pressed)
+
+func _on_pressed() -> void:
+	test_heart_rate(2048)
 
 func test_heart_rate(sample_size: int) -> void:
 	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
@@ -21,7 +24,7 @@ func test_heart_rate(sample_size: int) -> void:
 	print(heart_data)
 	
 	plot_debug_info(debug_info, false)
-	%RateLabel.text = "Heart Rate (bpm): " + str(heart_data["rate"]) 
+	%RateLabel.text = "Heart Rate (bpm): " + str(heart_data["rate"]) + ", Confidence: " + str(heart_data["confidence"] * 100) + "%" 
 
 func test_breathing_rate(sample_size: int) -> void:
 	var actual_sample_size: int = BreathingRateAlgorithm.GetActualSampleSize(sample_size)
@@ -75,4 +78,4 @@ func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:
 		%ICA5.visible = false
 		%ICA6.visible = false
 	
-	%FFT.plot(debug_info["FFT"].slice(0, len(debug_info["FFT"]) / 6))
+	%FFT.plot(debug_info["ProbabilityDistribution"].slice(0, len(debug_info["ProbabilityDistribution"]) / 8))

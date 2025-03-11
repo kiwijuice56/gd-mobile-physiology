@@ -15,7 +15,7 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	accelerometer.append(Input.get_accelerometer())
-	gyroscope.append(Vector3()) # Input.get_gyroscope())
+	gyroscope.append(Input.get_gyroscope())
 	
 	if len(accelerometer) == sample_amount_target:
 		sampling_complete.emit()

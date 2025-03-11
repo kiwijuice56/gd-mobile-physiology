@@ -135,4 +135,27 @@ public partial class SignalHelper : RefCounted {
 		}
 		return outputIndex;
 	}
+	
+	public static double[] SoftMax(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
+		double[] softMax = new double[fft.Length];
+		
+		double expSum = 0;
+		for (int i = 0; i < fft.Length; i++) {
+			double frequency = 60.0 / fft.Length * i;
+			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
+				expSum += fft[i] * fft[i];
+			}
+		}
+		
+		for (int i = 0; i < fft.Length; i++) {
+			double frequency = 60.0 / fft.Length * i;
+			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
+				softMax[i] = (fft[i] * fft[i]) / expSum;
+			} else {
+				softMax[i] = 0;
+			}
+		}
+		
+		return softMax;
+	}
 }

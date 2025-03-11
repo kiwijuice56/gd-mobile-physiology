@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Physiology Mobile Demo"
-run/main_scene="res://addons/gd-mobile-physiology/example/simple_demo/simple_demo.tscn"
+run/main_scene="uid://dsm5pj1lsvevs"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://addons/gd-mobile-physiology/icons/plugin_icon.png"
 
@@ -21,11 +21,10 @@ gdscript/warnings/integer_division=0
 
 [display]
 
-window/size/viewport_width=600
+window/size/viewport_width=2400
 window/size/viewport_height=1200
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation=1
 
 [dotnet]
 
