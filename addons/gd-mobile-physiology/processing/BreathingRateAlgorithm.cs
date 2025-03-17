@@ -73,7 +73,6 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
-		
 		// Run ICA (using external C# Accord library) 
 		data = SignalHelper.IndependentComponentAnalysis(data, gyroInvalid ? 3 : 6, sampleSize - LowPassRespirationFilter.Length);
 		
@@ -81,9 +80,9 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(data[1]);
 			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(data[2]);
-			/*debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(data[3]);
+			debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(data[3]);
 			debugInfo["ICAOutput4"] = new Godot.Collections.Array<double>(data[4]);
-			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(data[5]);*/
+			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
 		// Run FFT (using external C# Accord library) to find the strongest signal within respiration rate ranges

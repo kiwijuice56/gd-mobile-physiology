@@ -27,6 +27,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		for (int i = 0; i < 6; i++) {
 			data[i] = new double[sampleSize];
 		}
+		
 		for (int i = 0; i < sampleSize; i++) {
 			data[0][i] = accel[i].X;
 			data[1][i] = accel[i].Y;
@@ -34,6 +35,12 @@ public partial class HeartRateAlgorithm : GodotObject {
 			data[3][i] = gyro[i].X;
 			data[4][i] = gyro[i].Y;
 			data[5][i] = gyro[i].Z;
+		}
+		
+		// Check if gyroscope is completely 0
+		bool gyroInvalid = true;
+		for (int i = 0; i < sampleSize; i++) {
+			gyroInvalid = gyroInvalid && (data[3][i] == 0 && data[4][i] == 0 && data[5][i] == 0);
 		}
 		
 		if (debug) {
@@ -46,7 +53,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		}
 		
 		// Note: Signal will have extraneous samples at the end due to FIR filtering.
-		// These are removed as the array is recreated in the FFT step
+		// These are removed as the array is recreated in the ICA step
 		if (parallel) {
 			Parallel.For(0, 6, delegate(int i) {
 				PreprocessSignal(data[i]);
@@ -56,7 +63,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 				PreprocessSignal(data[i]);
 			}
 		}
-				
+		
 		if (debug) {
 			debugInfo["PreprocessedAccelX"] = new Godot.Collections.Array<double>(data[0]);
 			debugInfo["PreprocessedAccelY"] = new Godot.Collections.Array<double>(data[1]);
@@ -66,50 +73,61 @@ public partial class HeartRateAlgorithm : GodotObject {
 			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
 		}
 		
-		// Aggregate all signals into one
-		for (int i = 0; i < sampleSize - BallistocardiographyFilter.Length; i++) {
-			double sum = 0;
-			for (int j = 0; j < 6; j++) {
-				sum += data[j][i] * data[j][i];
-			}
-			data[0][i] = Math.Sqrt(sum); 
-		}
-		
-		double[] combinedSignal = SignalHelper.ApplyFirFilter(data[0], BandpassHeartRateFilter);
+		// Run ICA (using external C# Accord library) 
+		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(data, gyroInvalid ? 3 : 6, sampleSize - BallistocardiographyFilter.Length);
 		
 		if (debug) {
-			debugInfo["CombinedSignal"] = new Godot.Collections.Array<double>(combinedSignal);
+			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(componentSignals[0]);
+			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(componentSignals[1]);
+			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(componentSignals[2]);
+			debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
+			debugInfo["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
+			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
 		}
 		
-		// Run FFT (using external C# Accord library) 
-		double[] fft = SignalHelper.FastFourierTransform(combinedSignal, sampleSize - (BandpassHeartRateFilter.Length + BallistocardiographyFilter.Length));
-		double[] probabilityDistribution = SignalHelper.SoftMax(fft, 60, 120);
-		int index = SignalHelper.ExtractRate(fft, 60, 120);
-		
-		double confidenceSum = 0;
-		double frequencySum = 0;
-		int included = 0;
-		for (int i = index - 2; i <= index + 2; i++) {
-			if (i < 0 || i >= probabilityDistribution.Length) {
-				continue;
-			}
-			included++;
-			frequencySum += 60.0 / fft.Length * i;
-			confidenceSum += probabilityDistribution[i];
-		}
-		
-		double frequencyAverage = frequencySum / included;
+		var (frequency, confidence, probabilityDistribution, index) = BestICASignal(componentSignals);
 		
 		if (debug) {
-			debugInfo["FFT"] = new Godot.Collections.Array<double>(fft);
+			debugInfo["SelectedICAIndex"] = index;
 			debugInfo["ProbabilityDistribution"] = probabilityDistribution;
-		} 
+		}
 		
 		return new Godot.Collections.Dictionary
 		{
-			{"rate", frequencyAverage * 60.0},
-			{"confidence", confidenceSum},
+			{"rate", 60 * frequency},
+			{"confidence", confidence},
 		};
+	}
+	
+	private static (double, double, double[], int) BestICASignal(double[][] signals) {
+		double maxConfidence = 0.0;
+		double maxConfidenceFrequency = 0.0;
+		double[] maxProbabilityDistribution = [];
+		int icaIndex = 0;
+		
+		
+		for (int i = 0; i < signals.Length; i++) {
+			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
+			double[] probabilityDistribution = SignalHelper.SoftMax(fft, 60, 120);
+			
+			int index = SignalHelper.ExtractRate(fft, 60, 120);
+			
+			double confidence = 0;
+			for (int j = index - 2; j <= index + 2; j++) {
+				if (j < 0 || j >= probabilityDistribution.Length) {
+					continue;
+				}
+				confidence += probabilityDistribution[j];
+			}
+			
+			if (confidence >= maxConfidence) {
+				maxConfidence = confidence;
+				maxConfidenceFrequency = 60.0 / fft.Length * index;
+				icaIndex = i;
+				maxProbabilityDistribution = probabilityDistribution;
+			}
+		}
+		return (maxConfidenceFrequency, maxConfidence, maxProbabilityDistribution, icaIndex);
 	}
 	
 	private static void PreprocessSignal(double[] signal) {

@@ -23,7 +23,7 @@ func test_heart_rate(sample_size: int) -> void:
 	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
 	print(heart_data)
 	
-	plot_debug_info(debug_info, false)
+	plot_debug_info(debug_info)
 	%RateLabel.text = "Heart Rate (bpm): " + str(heart_data["rate"]) + ", Confidence: " + str(heart_data["confidence"] * 100) + "%" 
 
 func test_breathing_rate(sample_size: int) -> void:
@@ -38,10 +38,10 @@ func test_breathing_rate(sample_size: int) -> void:
 	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
 	print(breathing_data)
 	
-	plot_debug_info(debug_info, true)
+	plot_debug_info(debug_info)
 	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_data["rate"])
 
-func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:
+func plot_debug_info(debug_info: Dictionary) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
 	%RawDataZ.plot(debug_info["RawAccelZ"])
@@ -56,26 +56,13 @@ func plot_debug_info(debug_info: Dictionary, has_ica: bool) -> void:
 	%FixedDataY2.plot(debug_info["PreprocessedGyroY"])
 	%FixedDataZ2.plot(debug_info["PreprocessedGyroZ"])
 	
-	# Heart/respiration plot differently for the bottom left graph
-	if has_ica:
-		%ICATitle.text = "ICA Output"
-		
-		get_node("%ICA" + str(1 + debug_info["SelectedICAIndex"])).line_color = Color.RED
-		
-		%ICA1.plot(debug_info["ICAOutput0"])
-		%ICA2.plot(debug_info["ICAOutput1"])
-		%ICA3.plot(debug_info["ICAOutput2"])
-		%ICA4.plot(debug_info["ICAOutput3"])
-		%ICA5.plot(debug_info["ICAOutput4"])
-		%ICA6.plot(debug_info["ICAOutput5"])
-	else:
-		%ICATitle.text = "Combined Signal"
-		
-		%ICA1.plot(debug_info["CombinedSignal"])
-		%ICA2.visible = false
-		%ICA3.visible = false
-		%ICA4.visible = false
-		%ICA5.visible = false
-		%ICA6.visible = false
+	get_node("%ICA" + str(1 + debug_info["SelectedICAIndex"])).line_color = Color.RED
+	
+	%ICA1.plot(debug_info["ICAOutput0"])
+	%ICA2.plot(debug_info["ICAOutput1"])
+	%ICA3.plot(debug_info["ICAOutput2"])
+	%ICA4.plot(debug_info["ICAOutput3"])
+	%ICA5.plot(debug_info["ICAOutput4"])
+	%ICA6.plot(debug_info["ICAOutput5"])
 	
 	%FFT.plot(debug_info["ProbabilityDistribution"].slice(0, len(debug_info["ProbabilityDistribution"]) / 8))
