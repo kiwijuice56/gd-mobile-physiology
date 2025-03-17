@@ -19,7 +19,7 @@ func _on_record() -> void:
 	%HRLabel.text = "-"
 	%BRLabel.text = "-"
 	
-	var sample_size: int = 1024
+	var sample_size: int = 2048
 	var heart_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
 	var breath_sample_size: int = BreathingRateAlgorithm.GetActualSampleSize(sample_size)
 	var actual_sample_size: int = max(heart_sample_size, breath_sample_size)
@@ -36,7 +36,7 @@ func _on_record() -> void:
 	var gyroscope: Array[Vector3] = samples[1] 
 	
 	var debug_heart: Dictionary = {}
-	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer.slice(0, heart_sample_size), gyroscope.slice(0, heart_sample_size), false, debug_heart, true)
+	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer.slice(0, heart_sample_size), gyroscope.slice(0, heart_sample_size), true)
 	
 	var debug_breathing: Dictionary = {}
 	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer.slice(0, breath_sample_size), gyroscope.slice(0, breath_sample_size), false, debug_breathing, true)

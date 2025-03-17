@@ -11,114 +11,123 @@ public partial class HeartRateAlgorithm : GodotObject {
 	
 	// Accepts accelerometer and gyroscope samples and returns a dictionary with the entries:
 	// - "rate": Estimated heart rate in beats per minute.
-	// - "magnitude": The strength of the given rate in the frequency domain. This value varies based on sample size, but you can use this value to filter out noise/bad readings. Generally, the lower the magnitude, the weaker the signal.
+	// - "confidence": The confidence that the given rate is the actual heart rate. Generally, the lower the magnitude, the weaker the pulse waveform.
 	// Algorithm modified from `BioPhone: Physiology Monitoring from Peripheral Smartphone Motions: Javier Hernandez, Daniel J. McDuff and Rosalind W. Picard.`
-	// If `debug` is true, `debugInfo` will be filled with the following items:
+	// If `debugOutput` is true, the output dictionary will also be filled with the following items:
 	// - Raw[Accel/Gyro][X/Y/Z]: Signals before any processing
 	// - Preprocessed[Accel/Gyro][X/Y/Z]: Signals after basic processing
 	// - ICAOutput[0/1/2/3/4/5]: Output of independent component analysis in random order
-	// - SelectedICAIndex: The ICA signal that was used for determining breathing rate
-	// - FFT: The Fourier transform for the selected ICA signal
-	public static Godot.Collections.Dictionary Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, bool parallel, Godot.Collections.Dictionary debugInfo, bool debug) {
-		int sampleSize = accel.Count;
+	// - SelectedICAIndex: The ICA signal that was used for determining heart rate
+	// - ProbabilityDistribution: The confidence over the frequency domain
+	public static Godot.Collections.Dictionary Analyze(Godot.Collections.Array<Vector3> accel, Godot.Collections.Array<Vector3> gyro, bool debugOutput) {
+		/////////////////////////
+		//// INITIALIZATION  ////
+		/////////////////////////
 		
-		// Load data into arrays
-		double[][] data = new double[6][];
+		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{};
+		
+		int sampleSize = accel.Count;
+		if (accel.Count != gyro.Count) {
+			throw new ArgumentException("Must have the same amount of gyroscope and accelerometer samples.");
+		}
+		
+		// Load gyro/accel data into a 2D matrix
+		double[][] signals = new double[6][];
 		for (int i = 0; i < 6; i++) {
-			data[i] = new double[sampleSize];
+			signals[i] = new double[sampleSize];
 		}
 		
 		for (int i = 0; i < sampleSize; i++) {
-			data[0][i] = accel[i].X;
-			data[1][i] = accel[i].Y;
-			data[2][i] = accel[i].Z;
-			data[3][i] = gyro[i].X;
-			data[4][i] = gyro[i].Y;
-			data[5][i] = gyro[i].Z;
+			signals[0][i] = accel[i].X;
+			signals[1][i] = accel[i].Y;
+			signals[2][i] = accel[i].Z;
+			signals[3][i] = gyro[i].X;
+			signals[4][i] = gyro[i].Y;
+			signals[5][i] = gyro[i].Z;
 		}
 		
-		// Check if gyroscope is completely 0
+		// Check if gyroscope is completely 0 (can cause NaN propagation later)
 		bool gyroInvalid = true;
 		for (int i = 0; i < sampleSize; i++) {
-			gyroInvalid = gyroInvalid && (data[3][i] == 0 && data[4][i] == 0 && data[5][i] == 0);
+			gyroInvalid = gyroInvalid && (signals[3][i] == 0 && signals[4][i] == 0 && signals[5][i] == 0);
 		}
 		
-		if (debug) {
-			debugInfo["RawAccelX"] = new Godot.Collections.Array<double>(data[0]);
-			debugInfo["RawAccelY"] = new Godot.Collections.Array<double>(data[1]);
-			debugInfo["RawAccelZ"] = new Godot.Collections.Array<double>(data[2]);
-			debugInfo["RawGyroX"] = new Godot.Collections.Array<double>(data[3]);
-			debugInfo["RawGyroY"] = new Godot.Collections.Array<double>(data[4]);
-			debugInfo["RawGyroZ"] = new Godot.Collections.Array<double>(data[5]);
+		if (debugOutput) {
+			output["RawAccelX"] = new Godot.Collections.Array<double>(signals[0]);
+			output["RawAccelY"] = new Godot.Collections.Array<double>(signals[1]);
+			output["RawAccelZ"] = new Godot.Collections.Array<double>(signals[2]);
+			output["RawGyroX"] = new Godot.Collections.Array<double>(signals[3]);
+			output["RawGyroY"] = new Godot.Collections.Array<double>(signals[4]);
+			output["RawGyroZ"] = new Godot.Collections.Array<double>(signals[5]);
 		}
+		
+		
+		////////////////////////
+		//// PREPROCESSING  ////
+		////////////////////////
 		
 		// Note: Signal will have extraneous samples at the end due to FIR filtering.
 		// These are removed as the array is recreated in the ICA step
-		if (parallel) {
-			Parallel.For(0, 6, delegate(int i) {
-				PreprocessSignal(data[i]);
-			});
-		} else {
-			for (int i = 0; i < 6; i++) {
-				PreprocessSignal(data[i]);
-			}
+		for (int i = 0; i < 6; i++) {
+			PreprocessSignal(signals[i]);
 		}
 		
-		if (debug) {
-			debugInfo["PreprocessedAccelX"] = new Godot.Collections.Array<double>(data[0]);
-			debugInfo["PreprocessedAccelY"] = new Godot.Collections.Array<double>(data[1]);
-			debugInfo["PreprocessedAccelZ"] = new Godot.Collections.Array<double>(data[2]);
-			debugInfo["PreprocessedGyroX"] = new Godot.Collections.Array<double>(data[3]);
-			debugInfo["PreprocessedGyroY"] = new Godot.Collections.Array<double>(data[4]);
-			debugInfo["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(data[5]);
+		if (debugOutput) {
+			output["PreprocessedAccelX"] = new Godot.Collections.Array<double>(signals[0]);
+			output["PreprocessedAccelY"] = new Godot.Collections.Array<double>(signals[1]);
+			output["PreprocessedAccelZ"] = new Godot.Collections.Array<double>(signals[2]);
+			output["PreprocessedGyroX"] = new Godot.Collections.Array<double>(signals[3]);
+			output["PreprocessedGyroY"] = new Godot.Collections.Array<double>(signals[4]);
+			output["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(signals[5]);
 		}
+		
+		
+		/////////////////////////////////////////
+		//// INDEPENDENT COMPONENT ANALYSIS  ////
+		/////////////////////////////////////////
 		
 		// Run ICA (using external C# Accord library) 
-		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(data, gyroInvalid ? 3 : 6, sampleSize - BallistocardiographyFilter.Length);
+		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(signals, gyroInvalid ? 3 : 6, sampleSize - BallistocardiographyFilter.Length);
+		var (frequency, confidence, probabilityDistribution, index) = SelectHighestConfidenceSignal(componentSignals, 60, 120);
 		
-		if (debug) {
-			debugInfo["ICAOutput0"] = new Godot.Collections.Array<double>(componentSignals[0]);
-			debugInfo["ICAOutput1"] = new Godot.Collections.Array<double>(componentSignals[1]);
-			debugInfo["ICAOutput2"] = new Godot.Collections.Array<double>(componentSignals[2]);
-			debugInfo["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
-			debugInfo["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
-			debugInfo["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
+		if (debugOutput) {
+			output["ICAOutput0"] = new Godot.Collections.Array<double>(componentSignals[0]);
+			output["ICAOutput1"] = new Godot.Collections.Array<double>(componentSignals[1]);
+			output["ICAOutput2"] = new Godot.Collections.Array<double>(componentSignals[2]);
+			output["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
+			output["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
+			output["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
+			output["SelectedICAIndex"] = index;
+			output["ProbabilityDistribution"] = probabilityDistribution;
 		}
 		
-		var (frequency, confidence, probabilityDistribution, index) = BestICASignal(componentSignals);
+		output["rate"] = 60 * frequency;
+		output["confidence"] = confidence;
 		
-		if (debug) {
-			debugInfo["SelectedICAIndex"] = index;
-			debugInfo["ProbabilityDistribution"] = probabilityDistribution;
-		}
-		
-		return new Godot.Collections.Dictionary
-		{
-			{"rate", 60 * frequency},
-			{"confidence", confidence},
-		};
+		return output;
 	}
 	
-	private static (double, double, double[], int) BestICASignal(double[][] signals) {
+	// From a matrix of ICA output signals, return the signal with the highest confidence
+	// component frequency in the range of [minBeatsPerMin, maxBeatsPerMin]
+	//
+	// Returns frequency (hZ), confidence (0, 1), the frequency probabiility distribution of the signal,
+	// and the index of the selected signal in the matrix
+	private static (double, double, double[], int) SelectHighestConfidenceSignal(double[][] signals, double minBeatsPerMin, double maxBeatsPerMin) {
 		double maxConfidence = 0.0;
 		double maxConfidenceFrequency = 0.0;
 		double[] maxProbabilityDistribution = [];
 		int icaIndex = 0;
 		
-		
 		for (int i = 0; i < signals.Length; i++) {
 			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
-			double[] probabilityDistribution = SignalHelper.SoftMax(fft, 60, 120);
+			double[] probabilityDistribution = SignalHelper.SoftMax(fft, minBeatsPerMin, maxBeatsPerMin);
 			
-			int index = SignalHelper.ExtractRate(fft, 60, 120);
+			//probabilityDistribution = SignalHelper.MovingAverage(probabilityDistribution, 3);
+			//probabilityDistribution = SignalHelper.NormalizeMagnitude(probabilityDistribution);
 			
-			double confidence = 0;
-			for (int j = index - 2; j <= index + 2; j++) {
-				if (j < 0 || j >= probabilityDistribution.Length) {
-					continue;
-				}
-				confidence += probabilityDistribution[j];
-			}
+			int index = SignalHelper.ExtractRate(probabilityDistribution, minBeatsPerMin, maxBeatsPerMin);
+			
+			double confidence = probabilityDistribution[index];
 			
 			if (confidence >= maxConfidence) {
 				maxConfidence = confidence;
@@ -130,6 +139,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		return (maxConfidenceFrequency, maxConfidence, maxProbabilityDistribution, icaIndex);
 	}
 	
+	// Modify a time-series signal in-place to filter, detrend, and center it
 	private static void PreprocessSignal(double[] signal) {
 		// Use a sliding window average to detrend the samples
 		double[] detrendedSignal = SignalHelper.Detrend(signal, DetrendWindowSize);
@@ -143,7 +153,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 	}
 	
 	public static int GetActualSampleSize(int outputSampleSize) {
-		return outputSampleSize + BallistocardiographyFilter.Length + BandpassHeartRateFilter.Length;
+		return outputSampleSize + BallistocardiographyFilter.Length;
 	}
 	
 	public static readonly double[] BallistocardiographyFilter = {
@@ -208,379 +218,5 @@ public partial class HeartRateAlgorithm : GodotObject {
 	  -0.020243957295231565,
 	  0.005157445306135791,
 	  0.011242603325458032
-	};
-	
-	public static readonly double[] BandpassHeartRateFilter = {
-	-0.006650726180051685,
-	-0.003716190467484666,
-	-0.004510744296719715,
-	-0.00521720254595281,
-	-0.005771884734247281,
-	-0.006112786912708464,
-	-0.006184449660677189,
-	-0.005942963681906568,
-	-0.005360275248333453,
-	-0.004428058953483523,
-	-0.0031602339799788617,
-	-0.0015940474963824292,
-	0.0002107287467915236,
-	0.0021734692777209135,
-	0.004197688017291434,
-	0.0061756483463492684,
-	0.007995836395720823,
-	0.009549851178976733,
-	0.01074053545530899,
-	0.011489199325603959,
-	0.01174142027972564,
-	0.011473125747180736,
-	0.010692752587047466,
-	0.009441977549539293,
-	0.0077945154256935205,
-	0.00585153654824873,
-	0.003735317370191544,
-	0.0015818363339545395,
-	-0.00046994038796042227,
-	-0.002287324763791782,
-	-0.0037535626277634647,
-	-0.0047775598563370445,
-	-0.005299762805172446,
-	-0.005298757975731796,
-	-0.004792334537451158,
-	-0.003837671386247419,
-	-0.0025266790910885946,
-	-0.0009798937415978208,
-	0.0006624671338988642,
-	0.0022512793269127696,
-	0.0036402956565108613,
-	0.004697891830396264,
-	0.005316999183500442,
-	0.005426507037606445,
-	0.004991733402421099,
-	0.004029801016319747,
-	0.002591235987309778,
-	0.0007775479171242652,
-	-0.0012828286475674658,
-	-0.0034384643990877815,
-	-0.005521909205595639,
-	-0.007369871972672792,
-	-0.008835776558541876,
-	-0.009798029019443134,
-	-0.010172031790243112,
-	-0.009920569639718763,
-	-0.00905640679815879,
-	-0.007640763405986468,
-	-0.005779528973142642,
-	-0.003617919295961601,
-	-0.0013283812612890362,
-	0.0009038796533649169,
-	0.0028956939883382857,
-	0.004480186863194159,
-	0.005520248703527061,
-	0.00592141510395165,
-	0.005639998415945421,
-	0.004688480667214156,
-	0.00313545122457396,
-	0.001099852542942314,
-	-0.0012570368102269756,
-	-0.0037426824914975265,
-	-0.006149842569802828,
-	-0.00827219661757323,
-	-0.009921555154110523,
-	-0.010945299736035528,
-	-0.011236753007362833,
-	-0.010747492413547393,
-	-0.009489868186975697,
-	-0.007539142375360321,
-	-0.005027759240438287,
-	-0.0021363019972450935,
-	0.0009207559935499307,
-	0.003912069846567289,
-	0.0066079984344965285,
-	0.008799276008116757,
-	0.010313800571439756,
-	0.011032049371452851,
-	0.010896161892012486,
-	0.009918851966815074,
-	0.008179350176957709,
-	0.005822521639818249,
-	0.003044063772844189,
-	0.00007769315809848107,
-	-0.002822720293968579,
-	-0.005405893672337686,
-	-0.0074419349324242375,
-	-0.008741496470716847,
-	-0.009172744541069944,
-	-0.008672042402580585,
-	-0.007250219825001241,
-	-0.004994440871821379,
-	-0.002061185254621659,
-	0.0013358917244631367,
-	0.0049422408931557036,
-	0.008481103753208867,
-	0.011676150958180231,
-	0.014275037216580341,
-	0.016068582426412577,
-	0.0169077871088391,
-	0.016717145023417288,
-	0.01550315505084635,
-	0.013353213538087846,
-	0.010428810653384834,
-	0.006955708559967003,
-	0.0032061319551583128,
-	-0.0005253993218612463,
-	-0.003942199489431793,
-	-0.006769913145391314,
-	-0.00878249243496293,
-	-0.009813192366626065,
-	-0.009777135637696837,
-	-0.008672015800093415,
-	-0.006583784745351314,
-	-0.0036780312453136574,
-	-0.00018890893091516532,
-	0.0035988366618277564,
-	0.007371812427375682,
-	0.010812823867778779,
-	0.013626250988567632,
-	0.015561455601649942,
-	0.01643343608164373,
-	0.01613696107640229,
-	0.014656772571101779,
-	0.012067657175553791,
-	0.008531306620985512,
-	0.0042826327936871045,
-	-0.0003867073981068337,
-	-0.005150125958923728,
-	-0.009672135627923144,
-	-0.013633251345064615,
-	-0.016755840767390392,
-	-0.018826120288331825,
-	-0.019709870146954914,
-	-0.019362872440034807,
-	-0.01783463774510807,
-	-0.015264026247988826,
-	-0.011870643370144133,
-	-0.007939181851067817,
-	-0.0037982084660973213,
-	0.0002050684536772795,
-	0.0037320313490713172,
-	0.0064768442132456935,
-	0.008187941379842578,
-	0.008683717889847346,
-	0.007867082851053945,
-	0.0057360584968596025,
-	0.002385055352958615,
-	-0.0020074496458915127,
-	-0.007196225346133665,
-	-0.012878182901313881,
-	-0.01870169306417043,
-	-0.024308136815009557,
-	-0.029370988652255958,
-	-0.03354824056986322,
-	-0.0365926700170824,
-	-0.03829121291334846,
-	-0.03851736883703231,
-	-0.037217931460029274,
-	-0.03441746798235499,
-	-0.03021187532857289,
-	-0.02475887204346364,
-	-0.01826561026677426,
-	-0.01097439448341237,
-	-0.003147876491201682,
-	0.004945587757483256,
-	0.013044041865591804,
-	0.020903566529820245,
-	0.02830492388564697,
-	0.035059278980770915,
-	0.04100915697641635,
-	0.046028972666249744,
-	0.05002303185398491,
-	0.05292158852892863,
-	0.05467842197620301,
-	0.055266968193100854,
-	0.05467842197620301,
-	0.05292158852892863,
-	0.05002303185398491,
-	0.046028972666249744,
-	0.04100915697641635,
-	0.035059278980770915,
-	0.02830492388564697,
-	0.020903566529820245,
-	0.013044041865591804,
-	0.004945587757483256,
-	-0.003147876491201682,
-	-0.01097439448341237,
-	-0.01826561026677426,
-	-0.02475887204346364,
-	-0.03021187532857289,
-	-0.03441746798235499,
-	-0.037217931460029274,
-	-0.03851736883703231,
-	-0.03829121291334846,
-	-0.0365926700170824,
-	-0.03354824056986322,
-	-0.029370988652255958,
-	-0.024308136815009557,
-	-0.01870169306417043,
-	-0.012878182901313881,
-	-0.007196225346133665,
-	-0.0020074496458915127,
-	0.002385055352958615,
-	0.0057360584968596025,
-	0.007867082851053945,
-	0.008683717889847346,
-	0.008187941379842578,
-	0.0064768442132456935,
-	0.0037320313490713172,
-	0.0002050684536772795,
-	-0.0037982084660973213,
-	-0.007939181851067817,
-	-0.011870643370144133,
-	-0.015264026247988826,
-	-0.01783463774510807,
-	-0.019362872440034807,
-	-0.019709870146954914,
-	-0.018826120288331825,
-	-0.016755840767390392,
-	-0.013633251345064615,
-	-0.009672135627923144,
-	-0.005150125958923728,
-	-0.0003867073981068337,
-	0.0042826327936871045,
-	0.008531306620985512,
-	0.012067657175553791,
-	0.014656772571101779,
-	0.01613696107640229,
-	0.01643343608164373,
-	0.015561455601649942,
-	0.013626250988567632,
-	0.010812823867778779,
-	0.007371812427375682,
-	0.0035988366618277564,
-	-0.00018890893091516532,
-	-0.0036780312453136574,
-	-0.006583784745351314,
-	-0.008672015800093415,
-	-0.009777135637696837,
-	-0.009813192366626065,
-	-0.00878249243496293,
-	-0.006769913145391314,
-	-0.003942199489431793,
-	-0.0005253993218612463,
-	0.0032061319551583128,
-	0.006955708559967003,
-	0.010428810653384834,
-	0.013353213538087846,
-	0.01550315505084635,
-	0.016717145023417288,
-	0.0169077871088391,
-	0.016068582426412577,
-	0.014275037216580341,
-	0.011676150958180231,
-	0.008481103753208867,
-	0.0049422408931557036,
-	0.0013358917244631367,
-	-0.002061185254621659,
-	-0.004994440871821379,
-	-0.007250219825001241,
-	-0.008672042402580585,
-	-0.009172744541069944,
-	-0.008741496470716847,
-	-0.0074419349324242375,
-	-0.005405893672337686,
-	-0.002822720293968579,
-	0.00007769315809848107,
-	0.003044063772844189,
-	0.005822521639818249,
-	0.008179350176957709,
-	0.009918851966815074,
-	0.010896161892012486,
-	0.011032049371452851,
-	0.010313800571439756,
-	0.008799276008116757,
-	0.0066079984344965285,
-	0.003912069846567289,
-	0.0009207559935499307,
-	-0.0021363019972450935,
-	-0.005027759240438287,
-	-0.007539142375360321,
-	-0.009489868186975697,
-	-0.010747492413547393,
-	-0.011236753007362833,
-	-0.010945299736035528,
-	-0.009921555154110523,
-	-0.00827219661757323,
-	-0.006149842569802828,
-	-0.0037426824914975265,
-	-0.0012570368102269756,
-	0.001099852542942314,
-	0.00313545122457396,
-	0.004688480667214156,
-	0.005639998415945421,
-	0.00592141510395165,
-	0.005520248703527061,
-	0.004480186863194159,
-	0.0028956939883382857,
-	0.0009038796533649169,
-	-0.0013283812612890362,
-	-0.003617919295961601,
-	-0.005779528973142642,
-	-0.007640763405986468,
-	-0.00905640679815879,
-	-0.009920569639718763,
-	-0.010172031790243112,
-	-0.009798029019443134,
-	-0.008835776558541876,
-	-0.007369871972672792,
-	-0.005521909205595639,
-	-0.0034384643990877815,
-	-0.0012828286475674658,
-	0.0007775479171242652,
-	0.002591235987309778,
-	0.004029801016319747,
-	0.004991733402421099,
-	0.005426507037606445,
-	0.005316999183500442,
-	0.004697891830396264,
-	0.0036402956565108613,
-	0.0022512793269127696,
-	0.0006624671338988642,
-	-0.0009798937415978208,
-	-0.0025266790910885946,
-	-0.003837671386247419,
-	-0.004792334537451158,
-	-0.005298757975731796,
-	-0.005299762805172446,
-	-0.0047775598563370445,
-	-0.0037535626277634647,
-	-0.002287324763791782,
-	-0.00046994038796042227,
-	0.0015818363339545395,
-	0.003735317370191544,
-	0.00585153654824873,
-	0.0077945154256935205,
-	0.009441977549539293,
-	0.010692752587047466,
-	0.011473125747180736,
-	0.01174142027972564,
-	0.011489199325603959,
-	0.01074053545530899,
-	0.009549851178976733,
-	0.007995836395720823,
-	0.0061756483463492684,
-	0.004197688017291434,
-	0.0021734692777209135,
-	0.0002107287467915236,
-	-0.0015940474963824292,
-	-0.0031602339799788617,
-	-0.004428058953483523,
-	-0.005360275248333453,
-	-0.005942963681906568,
-	-0.006184449660677189,
-	-0.006112786912708464,
-	-0.005771884734247281,
-	-0.00521720254595281,
-	-0.004510744296719715,
-	-0.003716190467484666,
-	-0.006650726180051685
 	};
 }

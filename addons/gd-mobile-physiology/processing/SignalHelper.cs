@@ -158,4 +158,36 @@ public partial class SignalHelper : RefCounted {
 		
 		return softMax;
 	}
+	
+	public static double[] NormalizeMagnitude(double[] signal) {
+		double[] normalizedSignal = new double[signal.Length];
+		
+		double sum = 0;
+		for (int i = 0; i < signal.Length; i++) {
+			sum += signal[i];
+		}
+		
+		for (int i = 0; i < signal.Length; i++) {
+			normalizedSignal[i] = signal[i] / sum;
+		}
+		
+		return normalizedSignal;
+	}
+	
+	public static double[] MovingAverage(double[] signal, int windowSize) {
+		double[] averagedSignal = new double[signal.Length];
+		
+		double sum = 0;
+		for (int i = 0; i < signal.Length; i++) {
+			sum += signal[i];
+			
+			averagedSignal[i] = sum / windowSize;
+			
+			if (i - windowSize >= 0) {
+				sum -= signal[i - windowSize];
+			}
+		}
+		
+		return averagedSignal;
+	}
 }
