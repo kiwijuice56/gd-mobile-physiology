@@ -136,58 +136,28 @@ public partial class SignalHelper : RefCounted {
 		return outputIndex;
 	}
 	
-	public static double[] SoftMax(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
-		double[] softMax = new double[fft.Length];
+	// Creates a probability distribution from an FFT in the range [minBeatsPerMin, maxBeatsPerMin];
+	// All other values are 0
+	public static double[] FftToProbabilityDistribution(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
+		double[] distribution = new double[fft.Length];
 		
-		double expSum = 0;
+		double squareSum = 0;
 		for (int i = 0; i < fft.Length; i++) {
 			double frequency = 60.0 / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
-				expSum += fft[i] * fft[i];
+				squareSum += fft[i] * fft[i];
 			}
 		}
 		
 		for (int i = 0; i < fft.Length; i++) {
 			double frequency = 60.0 / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
-				softMax[i] = (fft[i] * fft[i]) / expSum;
+				distribution[i] = (fft[i] * fft[i]) / squareSum;
 			} else {
-				softMax[i] = 0;
+				distribution[i] = 0;
 			}
 		}
 		
-		return softMax;
-	}
-	
-	public static double[] NormalizeMagnitude(double[] signal) {
-		double[] normalizedSignal = new double[signal.Length];
-		
-		double sum = 0;
-		for (int i = 0; i < signal.Length; i++) {
-			sum += signal[i];
-		}
-		
-		for (int i = 0; i < signal.Length; i++) {
-			normalizedSignal[i] = signal[i] / sum;
-		}
-		
-		return normalizedSignal;
-	}
-	
-	public static double[] MovingAverage(double[] signal, int windowSize) {
-		double[] averagedSignal = new double[signal.Length];
-		
-		double sum = 0;
-		for (int i = 0; i < signal.Length; i++) {
-			sum += signal[i];
-			
-			averagedSignal[i] = sum / windowSize;
-			
-			if (i - windowSize >= 0) {
-				sum -= signal[i - windowSize];
-			}
-		}
-		
-		return averagedSignal;
+		return distribution;
 	}
 }

@@ -120,22 +120,20 @@ public partial class HeartRateAlgorithm : GodotObject {
 		
 		for (int i = 0; i < signals.Length; i++) {
 			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
-			double[] probabilityDistribution = SignalHelper.SoftMax(fft, minBeatsPerMin, maxBeatsPerMin);
+			double[] probabilityDistribution = SignalHelper.FftToProbabilityDistribution(fft, minBeatsPerMin, maxBeatsPerMin);
 			
-			//probabilityDistribution = SignalHelper.MovingAverage(probabilityDistribution, 3);
-			//probabilityDistribution = SignalHelper.NormalizeMagnitude(probabilityDistribution);
-			
-			int index = SignalHelper.ExtractRate(probabilityDistribution, minBeatsPerMin, maxBeatsPerMin);
+			int index = SignalHelper.ExtractRate(fft, minBeatsPerMin, maxBeatsPerMin);
 			
 			double confidence = probabilityDistribution[index];
 			
 			if (confidence >= maxConfidence) {
 				maxConfidence = confidence;
 				maxConfidenceFrequency = 60.0 / fft.Length * index;
-				icaIndex = i;
 				maxProbabilityDistribution = probabilityDistribution;
+				icaIndex = i;
 			}
 		}
+		
 		return (maxConfidenceFrequency, maxConfidence, maxProbabilityDistribution, icaIndex);
 	}
 	
@@ -147,7 +145,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		// Set mean and variance to 0 (z-scoring)
 		SignalHelper.Normalize(detrendedSignal);
 		
-		// Isolate signals realted to BCG movements
+		// Isolate signals related to BCG movements
 		double[] filteredSignal = SignalHelper.ApplyFirFilter(detrendedSignal, BallistocardiographyFilter);
 		filteredSignal.CopyTo(signal, 0);
 	}
