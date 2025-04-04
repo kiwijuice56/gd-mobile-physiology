@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 [GlobalClass]
 public partial class HeartRateAlgorithm : GodotObject {
-	private const int DetrendWindowSize = 128;
+	
 	
 	// Accepts accelerometer and gyroscope samples and returns a dictionary with the entries:
 	// - "rate": Estimated heart rate in beats per minute.
@@ -24,7 +24,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		//// INITIALIZATION  ////
 		/////////////////////////
 		
-		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{};
+		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{}; 
 		
 		int sampleSize = accel.Count;
 		if (accel.Count != gyro.Count) {
@@ -46,10 +46,15 @@ public partial class HeartRateAlgorithm : GodotObject {
 			signals[5][i] = gyro[i].Z;
 		}
 		
-		// Check if gyroscope is completely 0 (can cause NaN propagation later)
-		bool gyroInvalid = true;
+		// Check if gyroscope is completely 0 (can cause NaN propagation later);
+		
+		// Almost all devices with a gyroscope also have an accelerometer, but some devices with
+		// an accelerometer and no gyroscope exist, hence why the algorithm should work with
+		// a missing gyroscope. Godot/Unity return an empty Vector3 if the gyroscope is missing,
+		// so we can check for a missing gyroscope by looking at the values of the array
+		bool gyroscopeMissing = true;
 		for (int i = 0; i < sampleSize; i++) {
-			gyroInvalid = gyroInvalid && (signals[3][i] == 0 && signals[4][i] == 0 && signals[5][i] == 0);
+			gyroscopeMissing = gyroscopeMissing && (signals[3][i] == 0 && signals[4][i] == 0 && signals[5][i] == 0);
 		}
 		
 		if (debugOutput) {
@@ -61,7 +66,6 @@ public partial class HeartRateAlgorithm : GodotObject {
 			output["RawGyroZ"] = new Godot.Collections.Array<double>(signals[5]);
 		}
 		
-		
 		////////////////////////
 		//// PREPROCESSING  ////
 		////////////////////////
@@ -69,7 +73,7 @@ public partial class HeartRateAlgorithm : GodotObject {
 		// Note: Signal will have extraneous samples at the end due to FIR filtering.
 		// These are removed as the array is recreated in the ICA step
 		for (int i = 0; i < 6; i++) {
-			PreprocessSignal(signals[i]);
+			SignalHelper.PreprocessSignal(signals[i], BallistocardiographyFilter);
 		}
 		
 		if (debugOutput) {
@@ -87,67 +91,28 @@ public partial class HeartRateAlgorithm : GodotObject {
 		/////////////////////////////////////////
 		
 		// Run ICA (using external C# Accord library) 
-		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(signals, gyroInvalid ? 3 : 6, sampleSize - BallistocardiographyFilter.Length);
-		var (frequency, confidence, probabilityDistribution, index) = SelectHighestConfidenceSignal(componentSignals, 60, 120);
+		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(signals, gyroscopeMissing ? 3 : 6, sampleSize - BallistocardiographyFilter.Length);
+		var (frequency, confidence, probabilityDistribution, index, kurtosis) = SignalHelper.SelectHighestConfidenceSignal(componentSignals, 50, 130);
+		
+		output["rate"] = 60 * frequency;
+		output["confidence"] = confidence;
+		output["kurtosis"] = kurtosis;
+		
 		
 		if (debugOutput) {
 			output["ICAOutput0"] = new Godot.Collections.Array<double>(componentSignals[0]);
 			output["ICAOutput1"] = new Godot.Collections.Array<double>(componentSignals[1]);
 			output["ICAOutput2"] = new Godot.Collections.Array<double>(componentSignals[2]);
-			output["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
-			output["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
-			output["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
+			if (!gyroscopeMissing) {
+				output["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
+				output["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
+				output["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
+			}
 			output["SelectedICAIndex"] = index;
 			output["ProbabilityDistribution"] = probabilityDistribution;
 		}
 		
-		output["rate"] = 60 * frequency;
-		output["confidence"] = confidence;
-		
 		return output;
-	}
-	
-	// From a matrix of ICA output signals, return the signal with the highest confidence
-	// component frequency in the range of [minBeatsPerMin, maxBeatsPerMin]
-	//
-	// Returns frequency (hZ), confidence (0, 1), the frequency probabiility distribution of the signal,
-	// and the index of the selected signal in the matrix
-	private static (double, double, double[], int) SelectHighestConfidenceSignal(double[][] signals, double minBeatsPerMin, double maxBeatsPerMin) {
-		double maxConfidence = 0.0;
-		double maxConfidenceFrequency = 0.0;
-		double[] maxProbabilityDistribution = [];
-		int icaIndex = 0;
-		
-		for (int i = 0; i < signals.Length; i++) {
-			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
-			double[] probabilityDistribution = SignalHelper.FftToProbabilityDistribution(fft, minBeatsPerMin, maxBeatsPerMin);
-			
-			int index = SignalHelper.ExtractRate(fft, minBeatsPerMin, maxBeatsPerMin);
-			
-			double confidence = probabilityDistribution[index];
-			
-			if (confidence >= maxConfidence) {
-				maxConfidence = confidence;
-				maxConfidenceFrequency = 60.0 / fft.Length * index;
-				maxProbabilityDistribution = probabilityDistribution;
-				icaIndex = i;
-			}
-		}
-		
-		return (maxConfidenceFrequency, maxConfidence, maxProbabilityDistribution, icaIndex);
-	}
-	
-	// Modify a time-series signal in-place to filter, detrend, and center it
-	private static void PreprocessSignal(double[] signal) {
-		// Use a sliding window average to detrend the samples
-		double[] detrendedSignal = SignalHelper.Detrend(signal, DetrendWindowSize);
-		
-		// Set mean and variance to 0 (z-scoring)
-		SignalHelper.Normalize(detrendedSignal);
-		
-		// Isolate signals related to BCG movements
-		double[] filteredSignal = SignalHelper.ApplyFirFilter(detrendedSignal, BallistocardiographyFilter);
-		filteredSignal.CopyTo(signal, 0);
 	}
 	
 	public static int GetActualSampleSize(int outputSampleSize) {

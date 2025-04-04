@@ -225,4 +225,5 @@ line_color = Color(0.266667, 0.619608, 0.560784, 1)
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 8
+action_mode = 0
 text = "start"

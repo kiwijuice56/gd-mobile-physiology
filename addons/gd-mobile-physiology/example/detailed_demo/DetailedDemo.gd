@@ -9,9 +9,10 @@ func _ready() -> void:
 	%Start.pressed.connect(_on_pressed)
 
 func _on_pressed() -> void:
-	test_heart_rate(1024)
+	test_heart_rate(2048)
 
 func test_heart_rate(sample_size: int) -> void:
+	print("starting...")
 	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
 	
 	# Array of Array[Vector3] (accelerometer and gyroscope samples, respectively)
@@ -22,7 +23,7 @@ func test_heart_rate(sample_size: int) -> void:
 	var heart_data: Dictionary = HeartRateAlgorithm.Analyze(accelerometer, gyroscope, true)
 	
 	plot_debug_info(heart_data)
-	%RateLabel.text = "Heart Rate (bpm): " + str(heart_data["rate"]) + ", Confidence: " + str(heart_data["confidence"] * 100) + "%" 
+	%RateLabel.text = "Heart Rate (bpm): %.2f, Confidence: %.2f, Kurtosis: %.2f" % [heart_data["rate"], heart_data["confidence"], heart_data["kurtosis"]]
 
 func test_breathing_rate(sample_size: int) -> void:
 	var actual_sample_size: int = BreathingRateAlgorithm.GetActualSampleSize(sample_size)
@@ -55,8 +56,9 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 	%FixedDataZ2.plot(debug_info["PreprocessedGyroZ"])
 	
 	for i in range(6):
-		get_node("%ICA" + str(1 + i)).line_color = Color.REBECCA_PURPLE
-		get_node("%ICA" + str(1 + i)).plot(debug_info["ICAOutput%d" % i])
+		if "ICAOutput%d" % i in debug_info:
+			get_node("%ICA" + str(1 + i)).line_color = Color.REBECCA_PURPLE
+			get_node("%ICA" + str(1 + i)).plot(debug_info["ICAOutput%d" % i])
 	get_node("%ICA" + str(1 + debug_info["SelectedICAIndex"])).line_color = Color.RED
 	
 	%ProbabilityDistribution.plot(debug_info["ProbabilityDistribution"].slice(0, len(debug_info["ProbabilityDistribution"]) / 8))

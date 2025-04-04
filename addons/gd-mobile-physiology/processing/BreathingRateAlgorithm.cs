@@ -37,7 +37,12 @@ public partial class BreathingRateAlgorithm : GodotObject {
 			data[5][i] = gyro[i].Z;
 		}
 		
-		// Check if gyroscope is completely 0
+		// Check if gyroscope is completely 0 (can cause NaN propagation later);
+		
+		// Almost all devices with a gyroscope also have an accelerometer, but some devices with
+		// an accelerometer and no gyroscope exist, hence why the algorithm should work with
+		// a missing gyroscope. Godot/Unity return an empty Vector3 if the gyroscope is missing,
+		// so we can check for a missing gyroscope by looking at the values of the array
 		bool gyroInvalid = true;
 		for (int i = 0; i < sampleSize; i++) {
 			gyroInvalid = gyroInvalid && (data[3][i] == 0 && data[4][i] == 0 && data[5][i] == 0);
@@ -104,7 +109,7 @@ public partial class BreathingRateAlgorithm : GodotObject {
 		double maxConfidence = 0.0;
 		double maxConfidenceFrequency = 0.0;
 		for (int i = 0; i < (gyroInvalid ? 3 : 6); i++) {
-			int index = SignalHelper.ExtractRate(data[i], 8.0, 45.0);
+			int index = SignalHelper.FindPeakInRange(data[i], 8.0, 45.0);
 			if (data[i][index] >= maxConfidence) {
 				maxConfidence = data[i][index];
 				maxConfidenceFrequency = 60.0 / data[i].Length * index;
