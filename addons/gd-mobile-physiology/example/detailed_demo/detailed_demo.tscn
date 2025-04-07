@@ -93,7 +93,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer"]
 layout_mode = 2
-text = "Raw Data (x, y, z accelerometer + gyro readings)"
+text = "1) Raw Data (x, y, z accelerometer + gyro readings)"
 
 [node name="RawDataX" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
@@ -132,7 +132,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4"]
 layout_mode = 2
-text = "Detrended, Z-Scored, and Filtered Data"
+text = "2) Detrended, Z-Scored, and Filtered Data"
 
 [node name="FixedDataX" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
@@ -170,9 +170,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ICATitle" type="Label" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5"]
-unique_name_in_owner = true
 layout_mode = 2
-text = "ICA Output"
+text = "3) ICA Output"
 
 [node name="ICA1" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_xg04p")]
 unique_name_in_owner = true
@@ -209,6 +208,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="ProbabilityTitle" type="Label" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "4) Result + Normalized FFT of Best ICA Signal"
+
 [node name="RateLabel" type="Label" parent="UI/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -221,9 +227,41 @@ unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="Start" type="Button" parent="UI/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 12
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="StartHeart" type="Button" parent="UI/VBoxContainer/MarginContainer/ButtonContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_horizontal = 3
 action_mode = 0
-text = "start"
+text = "start heart rate measurement"
+
+[node name="StartBreathing" type="Button" parent="UI/VBoxContainer/MarginContainer/ButtonContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+action_mode = 0
+text = "start breathing rate measurement"
+
+[node name="SampleSizePicker" type="OptionButton" parent="UI/VBoxContainer/MarginContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(512, 0)
+layout_mode = 2
+selected = 2
+item_count = 3
+popup/item_0/text = "512 samples"
+popup/item_0/id = 0
+popup/item_1/text = "1024 samples"
+popup/item_1/id = 1
+popup/item_2/text = "2048 samples"
+popup/item_2/id = 2

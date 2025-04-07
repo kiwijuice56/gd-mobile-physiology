@@ -5,14 +5,23 @@ extends Node
 
 # You may need to resize the window to get the charts to appear correctly
 
-func _ready() -> void:
-	%Start.pressed.connect(_on_pressed)
+var sample_size: int = 2048
 
-func _on_pressed() -> void:
-	test_heart_rate(2048)
+func _ready() -> void:
+	%StartHeart.pressed.connect(_on_pressed_heart)
+	%StartBreathing.pressed.connect(_on_pressed_breathing)
+	%SampleSizePicker.item_selected.connect(_on_sample_size_selected)
+
+func _on_sample_size_selected(index: int) -> void:
+	sample_size = [512, 1024, 2048][index]
+
+func _on_pressed_heart() -> void:
+	test_heart_rate(sample_size)
+
+func _on_pressed_breathing() -> void:
+	test_breathing_rate(sample_size)
 
 func test_heart_rate(sample_size: int) -> void:
-	print("starting...")
 	var actual_sample_size: int = HeartRateAlgorithm.GetActualSampleSize(sample_size)
 	
 	# Array of Array[Vector3] (accelerometer and gyroscope samples, respectively)
@@ -33,12 +42,10 @@ func test_breathing_rate(sample_size: int) -> void:
 	var accelerometer: Array[Vector3] = samples[0]
 	var gyroscope: Array[Vector3] = samples[1]
 	
-	var debug_info: Dictionary = {}
-	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, false, debug_info, true)
-	print(breathing_data)
+	var breathing_data: Dictionary = BreathingRateAlgorithm.Analyze(accelerometer, gyroscope, true)
 	
-	plot_debug_info(debug_info)
-	%RateLabel.text = "Breathing Rate (bpm): " + str(breathing_data["rate"])
+	plot_debug_info(breathing_data)
+	%RateLabel.text = "Breathing Rate (bpm): %.2f, Confidence: %.2f, Kurtosis: %.2f" % [breathing_data["rate"], breathing_data["confidence"], breathing_data["kurtosis"]]
 
 func plot_debug_info(debug_info: Dictionary) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])

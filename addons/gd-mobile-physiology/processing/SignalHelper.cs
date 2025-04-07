@@ -15,8 +15,10 @@ using Accord.Math.Transforms;
 
 [GlobalClass]
 public partial class SignalHelper : RefCounted {
-	public const int DetrendWindowSize = 128; // For now, both HR and BR use the same size window
+	public static readonly int DetrendWindowSize = 128; // For now, both HR and BR use the same size window
+	public static readonly float SamplingFrequency = 60;
 	
+	// Returns the average of a signal
 	public static double Average(double[] sample) {
 		double average = 0.0;
 		foreach (double val in sample) {
@@ -25,6 +27,7 @@ public partial class SignalHelper : RefCounted {
 		return average / sample.Length;
 	}
 	
+	// Returns the stdev of a signal
 	public static double StandardDeviation(double[] sample) {
 		double average = Average(sample);
 		double stdev = 0.0;
@@ -34,9 +37,9 @@ public partial class SignalHelper : RefCounted {
 		return Math.Sqrt(stdev / sample.Length);
 	}
 	
-	// Removes overall patterns in a signal, such as subtly increasing
-	// or decreasing over time. A good windowSize requires some experimentation,
-	// but 1/8 - 1/16 of the sample size is a good rule of thumb
+	// Removes overall patterns in a signal, such as a subtle increase
+	// or decrease over time. A good windowSize requires some experimentation,
+	// but 1/8 - 1/16 of the input size seems to work well
 	public static double[] Detrend(double[] sample, int windowSize) {
 		double totalAverage = sample[0];
 		double average = totalAverage;
@@ -67,7 +70,7 @@ public partial class SignalHelper : RefCounted {
 		}
 	} 
 	
-	// Applies a Finite Impulse Response (FIR) filter to 
+	// Returns a new signal with a Finite Impulse Response (FIR) filter applied to 
 	// isolate frequency ranges in the signal
 	public static double[] ApplyFirFilter(double[] sample, double[] filter) {
 		double[] output = new double[sample.Length - filter.Length];
@@ -94,7 +97,9 @@ public partial class SignalHelper : RefCounted {
 		filteredSignal.CopyTo(signal, 0);
 	}
 	
-	public static double[][] TransposeMatrix(double[][] data, int n, int m) {
+	// Returns the data matrix (nxm) transpoed to (mxn)
+	// Needed to interface with Accord's ICA algorithm
+	private static double[][] TransposeMatrix(double[][] data, int n, int m) {
 		double[][] transposedData = new double[m][];
 		for (int i = 0; i < m; i++) {
 			transposedData[i] = new double[n];
@@ -109,7 +114,12 @@ public partial class SignalHelper : RefCounted {
 		return transposedData;
 	}
 	
-	// Isolates correlated signals into clean possible components
+	// Isolates correlated signals into clean (possible) components
+	
+	// `signalCount` should be the number of distinct signals (like the x, y, and z channels of the accelerometer),
+	// while `sampleSize` is the length of each signal.
+	
+	// Returns `signalCount` signals of `sampleSize`
 	public static double[][] IndependentComponentAnalysis(double[][] samples, int signalCount, int sampleSize) {
 		// Accord.NET expects each column to be an input to ICA,
 		// while the rest of this program expects each row
@@ -137,13 +147,13 @@ public partial class SignalHelper : RefCounted {
 		return realComponent;
 	}
 	
-	// Finds the index within the Fourier transform corresponding to the highest amplitude 
+	// Finds the 0-based index within the Fourier transform corresponding to the highest amplitude 
 	// within the given frequency range (in beats per minute).
 	public static int FindPeakInRange(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
 		double maxAmplitude = 0.0;
 		int outputIndex = 0;
 		for (int i = 0; i < fft.Length; i++) {
-			double frequency = 60.0 / fft.Length * i;
+			double frequency = SamplingFrequency / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0 && fft[i] > maxAmplitude) {
 				maxAmplitude = fft[i];
 				outputIndex = i;
@@ -152,37 +162,23 @@ public partial class SignalHelper : RefCounted {
 		return outputIndex;
 	}
 	
-	// Given a probability distribution and index of the result (HR, BR) in that probability distribution,
-	// return the confidence score. For now, this sums nearby probabilities to account for 
-	// fuzzy peaks (in the range windowSize). 
-	public static double GetConfidenceOfPrediction(double[] probabilityDistribution, int peakIndex, int windowSize) {
-		double confidenceSum = 0.0;
-		for (int i = peakIndex - windowSize; i <= peakIndex + windowSize; i++) {
-			if (i < 0 || i >= probabilityDistribution.Length) {
-				continue;
-			}
-			confidenceSum += probabilityDistribution[i];
-		}
-		return confidenceSum;
-	}
-	
-	// Creates a probability distribution from an FFT in the range [minBeatsPerMin, maxBeatsPerMin];
-	// All other values are 0
-	public static double[] FftToProbabilityDistribution(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
+	// Creates a normalized FFT from an FFT in the range [minBeatsPerMin, maxBeatsPerMin];
+	// Return has the same length as `fft`, but all values outisde range are 0
+	public static double[] NormalizedFrequencyDomainInRange(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
 		double[] distribution = new double[fft.Length];
 		
-		double squareSum = 0;
+		double sum = 0;
 		for (int i = 0; i < fft.Length; i++) {
-			double frequency = 60.0 / fft.Length * i;
+			double frequency = SamplingFrequency / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
-				squareSum += fft[i];
+				sum += fft[i];
 			}
 		}
 		
 		for (int i = 0; i < fft.Length; i++) {
-			double frequency = 60.0 / fft.Length * i;
+			double frequency = SamplingFrequency / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
-				distribution[i] = (fft[i]) / squareSum;
+				distribution[i] = (fft[i]) / sum;
 			} else {
 				distribution[i] = 0;
 			}
@@ -191,11 +187,13 @@ public partial class SignalHelper : RefCounted {
 		return distribution;
 	}
 	
-	public static double[] PowerSpectrumInRange(double[] fft,  double minBeatsPerMin, double maxBeatsPerMin) {
+	// Creates a power spectrum from an FFT in range [minBeatsPerMin, maxPeatsPerMin];
+	// Return has the same length as `fft` but all values outside range are 0
+	public static double[] PowerSpectrumInRange(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
 		double[] powerSpectrum = new double[fft.Length];
 		
 		for (int i = 0; i < fft.Length; i++) {
-			double frequency = 60.0 / fft.Length * i;
+			double frequency = SamplingFrequency / fft.Length * i;
 			if (minBeatsPerMin / 60.0 < frequency && frequency < maxBeatsPerMin / 60.0) {
 				powerSpectrum[i] = fft[i] * fft[i];
 			}
@@ -204,12 +202,13 @@ public partial class SignalHelper : RefCounted {
 		return powerSpectrum;
 	}
 	
+	// Returns the spectral centroid of a power spectrum in range [minBeatsPerMin, maxPeatsPerMin]
 	// https://openae.io/standards/features/latest/spectral-kurtosis/
 	public static double SpectralCentroid(double[] powerSpectrum, double minBeatsPerMin, double maxBeatsPerMin) {
 		double powerSpectrumSum = 0;
 		double powerSpectrumSumWeighted = 0;
 		for (int i = 0; i < powerSpectrum.Length; i++) {
-			double frequency = 60.0 / powerSpectrum.Length * i;
+			double frequency = SamplingFrequency / powerSpectrum.Length * i;
 			double magnitude = powerSpectrum[i];
 			powerSpectrumSum += magnitude;
 			powerSpectrumSumWeighted += magnitude * frequency;
@@ -218,12 +217,11 @@ public partial class SignalHelper : RefCounted {
 		return powerSpectrumSumWeighted / powerSpectrumSum;
 	}
 	
+	// Returns the spectral centroid of a FFT in range [minBeatsPerMin, maxPeatsPerMin]
 	// https://openae.io/standards/features/latest/spectral-kurtosis/
 	public static double SpectralKurtosis(double[] fft, double minBeatsPerMin, double maxBeatsPerMin) {
 		double[] powerSpectrum = PowerSpectrumInRange(fft, minBeatsPerMin, maxBeatsPerMin);
 		double centroid = SpectralCentroid(powerSpectrum, minBeatsPerMin, maxBeatsPerMin);
-		
-		GD.Print(centroid);
 		
 		double powerSpectrumSum = 0;
 		double powerSpectrumSumWeighted2 = 0;
@@ -237,39 +235,160 @@ public partial class SignalHelper : RefCounted {
 			powerSpectrumSumWeighted4 += magnitude * Math.Pow(frequency - centroid, 4);
 		}
 		
-		return (powerSpectrumSumWeighted4 / powerSpectrumSum) / Math.Pow(powerSpectrumSumWeighted2 / powerSpectrumSum, 2);
+		// Subtract by 2 to normalize
+		return (powerSpectrumSumWeighted4 / powerSpectrumSum) / Math.Pow(powerSpectrumSumWeighted2 / powerSpectrumSum, 2) - 2;
 	}
 	
-	// From a matrix of ICA output signals, return the signal with the highest confidence
+	// From a matrix of ICA output signals, return the signal with the highest strength
 	// component frequency in the range of [minBeatsPerMin, maxBeatsPerMin]
 	//
-	// Returns frequency (hZ), confidence (0, 1), the frequency probabiility distribution of the signal,
-	// and the index of the selected signal in the ICA matrix (for debugging purposes)
-	public static (double, double, double[], int, double) SelectHighestConfidenceSignal(double[][] signals, double minBeatsPerMin, double maxBeatsPerMin) {
-		double maxConfidence = 0.0;
-		double maxConfidenceFrequency = 0.0;
-		double[] maxProbabilityDistribution = [];
-		double maxKurtosis = 0;
-		int icaIndex = 0;
+	// Returns the strongest frequency of the selected signal (hZ), 
+	// the relative strength of the peak frequency (0, 1), 
+	// the spectral kurtosis of the clearest signal (in the frequency domain), 
+	// the frequency distribution of the signal (normalized) [for debugging], 
+	// and the index of the selected signal in the ICA matrix [for debugging]
+	public static (double, double, double, double[], int) SelectHighestConfidenceSignal(double[][] signals, double minBeatsPerMin, double maxBeatsPerMin) {
+		double maxStrength = 0.0;
+		
+		double bestSignalFrequency = 0.0;
+		double[] bestSignalFft = [];
+		double bestSignalKurtosis = 0;
+		int bestSignalIndex = 0;
 		
 		for (int i = 0; i < signals.Length; i++) {
 			// Convert signal to frequency domain
 			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
-			double[] probabilityDistribution = SignalHelper.FftToProbabilityDistribution(fft, minBeatsPerMin, maxBeatsPerMin);
+			double[] normalizedFft = SignalHelper.NormalizedFrequencyDomainInRange(fft, minBeatsPerMin, maxBeatsPerMin);
 			
-			// Find the strongest HR frequency in this ICA signal
+			// Find the strongest frequency in this ICA signal
 			int peakIndex = SignalHelper.FindPeakInRange(fft, minBeatsPerMin, maxBeatsPerMin);
-			double confidence = GetConfidenceOfPrediction(probabilityDistribution, peakIndex, 6);
+			double kurtosis = SpectralKurtosis(fft, minBeatsPerMin, maxBeatsPerMin);
 			
-			if (confidence >= maxConfidence) {
-				maxConfidence = confidence;
-				maxConfidenceFrequency = 60.0 / fft.Length * peakIndex;
-				maxProbabilityDistribution = probabilityDistribution;
-				maxKurtosis = SpectralKurtosis(fft, minBeatsPerMin, maxBeatsPerMin);
-				icaIndex = i;
+			if (kurtosis >= bestSignalKurtosis) {
+				maxStrength = normalizedFft[peakIndex];
+				bestSignalFrequency = SamplingFrequency / fft.Length * peakIndex;
+				bestSignalFft = normalizedFft;
+				bestSignalKurtosis = SpectralKurtosis(fft, minBeatsPerMin, maxBeatsPerMin);
+				bestSignalIndex = i;
 			}
 		}
 		
-		return (maxConfidenceFrequency, maxConfidence, maxProbabilityDistribution, icaIndex, maxKurtosis);
+		return (bestSignalFrequency, maxStrength, bestSignalKurtosis, bestSignalFft, bestSignalIndex);
+	}
+	
+	
+	// Calculates heart/breathing rate (in the range [`minBeatsPerMin`, `maxBeatsPerMin`]) from the 
+	// vibrations of a person holding a mobile device using the accelerometer and gyroscope, 
+	// both sampled at 60 Hz.
+	//
+	// Accepts accelerometer and gyroscope samples and returns a dictionary with the entries:
+	// - "rate": Estimated rate in beats per minute.
+	// - "confidence": The confidence that the given rate is the actual rate. Generally, the lower the magnitude, the weaker the pulse waveform.
+	// - "kurtosis": the "peak"-ness of the pulse waveform in the frequency domain. Generally, values >> 0 indicate a strong pulse waveform.
+	//
+	// Requires a FIR filter, used to preprocess the signal and remove background noise.
+	// The length of `gyro` minus the length of `filter` must be a power of 2, likewise for `accel`. 
+	// 
+	// If `debugOutput` is true, the output dictionary will also be filled with the following items:
+	// - Raw[Accel/Gyro][X/Y/Z]: Signals before any processing
+	// - Preprocessed[Accel/Gyro][X/Y/Z]: Signals after basic processing
+	// - ICAOutput[0/1/2/3/4/5]: Output of independent component analysis in random order
+	// - SelectedICAIndex: The ICA signal that was used for determining rate
+	// - ProbabilityDistribution: The confidence over the frequency domain
+	// 
+	// Algorithm modified from `BioPhone: Physiology Monitoring from Peripheral Smartphone Motions: Javier Hernandez, Daniel J. McDuff and Rosalind W. Picard.`
+	public static Godot.Collections.Dictionary FindRate(Godot.Collections.Array<Godot.Vector3> accel, Godot.Collections.Array<Godot.Vector3> gyro, double minBeatsPerMin, double maxBeatsPerMin, double[] filter, bool debugOutput) {
+		/////////////////////////
+		//// INITIALIZATION  ////
+		/////////////////////////
+		
+		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{}; 
+		
+		int sampleSize = accel.Count;
+		if (accel.Count != gyro.Count) {
+			throw new ArgumentException("Must have the same amount of gyroscope and accelerometer samples.");
+		}
+		
+		// Load gyro/accel data into a 2D matrix
+		double[][] signals = new double[6][];
+		for (int i = 0; i < 6; i++) {
+			signals[i] = new double[sampleSize];
+		}
+		
+		for (int i = 0; i < sampleSize; i++) {
+			signals[0][i] = accel[i].X;
+			signals[1][i] = accel[i].Y;
+			signals[2][i] = accel[i].Z;
+			signals[3][i] = gyro[i].X;
+			signals[4][i] = gyro[i].Y;
+			signals[5][i] = gyro[i].Z;
+		}
+		
+		// Check if gyroscope is completely 0 (can cause NaN propagation later);
+		
+		// Almost all devices with a gyroscope also have an accelerometer, but some devices with
+		// an accelerometer and no gyroscope exist, hence why the algorithm should work with
+		// a missing gyroscope. Godot/Unity return an empty Vector3 if the gyroscope is missing,
+		// so we can check for a missing gyroscope by looking at the values of the array
+		bool gyroscopeMissing = true;
+		for (int i = 0; i < sampleSize; i++) {
+			gyroscopeMissing = gyroscopeMissing && (signals[3][i] == 0 && signals[4][i] == 0 && signals[5][i] == 0);
+		}
+		
+		if (debugOutput) {
+			output["RawAccelX"] = new Godot.Collections.Array<double>(signals[0]);
+			output["RawAccelY"] = new Godot.Collections.Array<double>(signals[1]);
+			output["RawAccelZ"] = new Godot.Collections.Array<double>(signals[2]);
+			output["RawGyroX"] = new Godot.Collections.Array<double>(signals[3]);
+			output["RawGyroY"] = new Godot.Collections.Array<double>(signals[4]);
+			output["RawGyroZ"] = new Godot.Collections.Array<double>(signals[5]);
+		}
+		
+		////////////////////////
+		//// PREPROCESSING  ////
+		////////////////////////
+		
+		// Note: Signal will have extraneous samples at the end due to FIR filtering.
+		// These are removed as the array is recreated in the ICA step
+		for (int i = 0; i < 6; i++) {
+			SignalHelper.PreprocessSignal(signals[i], filter);
+		}
+		
+		if (debugOutput) {
+			output["PreprocessedAccelX"] = new Godot.Collections.Array<double>(signals[0]);
+			output["PreprocessedAccelY"] = new Godot.Collections.Array<double>(signals[1]);
+			output["PreprocessedAccelZ"] = new Godot.Collections.Array<double>(signals[2]);
+			output["PreprocessedGyroX"] = new Godot.Collections.Array<double>(signals[3]);
+			output["PreprocessedGyroY"] = new Godot.Collections.Array<double>(signals[4]);
+			output["PreprocessedGyroZ"] = new Godot.Collections.Array<double>(signals[5]);
+		}
+		
+		
+		/////////////////////////////////////////
+		//// INDEPENDENT COMPONENT ANALYSIS  ////
+		/////////////////////////////////////////
+		
+		// Run ICA (using external C# Accord library) 
+		double[][] componentSignals = SignalHelper.IndependentComponentAnalysis(signals, gyroscopeMissing ? 3 : 6, sampleSize - filter.Length);
+		var (frequency, strength, kurtosis, probabilityDistribution, index) = SignalHelper.SelectHighestConfidenceSignal(componentSignals, minBeatsPerMin, maxBeatsPerMin); 
+		
+		output["rate"] = 60 * frequency;
+		output["confidence"] = strength;
+		output["kurtosis"] = kurtosis;
+		
+		if (debugOutput) {
+			output["ICAOutput0"] = new Godot.Collections.Array<double>(componentSignals[0]);
+			output["ICAOutput1"] = new Godot.Collections.Array<double>(componentSignals[1]);
+			output["ICAOutput2"] = new Godot.Collections.Array<double>(componentSignals[2]);
+			if (!gyroscopeMissing) {
+				output["ICAOutput3"] = new Godot.Collections.Array<double>(componentSignals[3]);
+				output["ICAOutput4"] = new Godot.Collections.Array<double>(componentSignals[4]);
+				output["ICAOutput5"] = new Godot.Collections.Array<double>(componentSignals[5]);
+			}
+			output["SelectedICAIndex"] = index;
+			output["ProbabilityDistribution"] = probabilityDistribution;
+		}
+		
+		return output;
 	}
 }
