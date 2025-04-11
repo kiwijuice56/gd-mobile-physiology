@@ -37,9 +37,30 @@ public partial class SignalHelper : RefCounted {
 		return Math.Sqrt(stdev / sample.Length);
 	}
 	
+	// Returns a smoothed signal with the given windowSize;
+	// Warning: the signal will become slightly shifted left, so don't
+	// use this operation where the precise domain values matter  
+	public static double[] Smooth(double[] signal, int windowSize) {
+		double[] output = new double[signal.Length];
+		double sum = 0.0;
+		for (int i = 0; i < signal.Length; i++) {
+			sum += signal[i];
+			
+			output[i] = sum / windowSize;
+			
+			if (i - windowSize >= 0) {
+				sum -= signal[i - windowSize];
+			}
+		}
+		
+		return output;
+	}
+	
 	// Removes overall patterns in a signal, such as a subtle increase
 	// or decrease over time. A good windowSize requires some experimentation,
 	// but 1/8 - 1/16 of the input size seems to work well
+	// Warning: the signal will become slightly shifted left, so don't
+	// use this operation where the precise domain values matter
 	public static double[] Detrend(double[] sample, int windowSize) {
 		double totalAverage = sample[0];
 		double average = totalAverage;
@@ -133,6 +154,7 @@ public partial class SignalHelper : RefCounted {
 		return TransposeMatrix(transposedResult, transposedSamples.Length, transposedSamples[0].Length);
 	}
 	
+	// Returns the FFT of a signal's first `sampleSize` elements (usually just the length)
 	public static double[] FastFourierTransform(double[] signal, int sampleSize) {
 		double[] realComponent = new double[sampleSize];
 		double[] complexComponent = new double[sampleSize];
@@ -256,19 +278,27 @@ public partial class SignalHelper : RefCounted {
 		int bestSignalIndex = 0;
 		
 		for (int i = 0; i < signals.Length; i++) {
-			// Convert signal to frequency domain
+			// Convert signal to frequency domain, then normalize it in the BPM range given
 			double[] fft = SignalHelper.FastFourierTransform(signals[i], signals[i].Length);
 			double[] normalizedFft = SignalHelper.NormalizedFrequencyDomainInRange(fft, minBeatsPerMin, maxBeatsPerMin);
 			
-			// Find the strongest frequency in this ICA signal
-			int peakIndex = SignalHelper.FindPeakInRange(fft, minBeatsPerMin, maxBeatsPerMin);
-			double kurtosis = SpectralKurtosis(fft, minBeatsPerMin, maxBeatsPerMin);
+			// We want to measure kurtosis in the frequency domain (i.e. the strength of the peak)
+			// Smoothing helps with this, although this signal might be shifted due to how the smoothing 
+			// is implemented -- only use for kurtosis!
+			double[] smoothedFft = SignalHelper.Smooth(normalizedFft, 6);
+			double kurtosis = SpectralKurtosis(smoothedFft, minBeatsPerMin, maxBeatsPerMin);
 			
+			// This frequency has a strong peak, so it probably closer to a clean pulse
 			if (kurtosis >= bestSignalKurtosis) {
+				// Find the strongest frequency in this ICA signal
+				int peakIndex = SignalHelper.FindPeakInRange(fft, minBeatsPerMin, maxBeatsPerMin);
+				
 				maxStrength = normalizedFft[peakIndex];
+				
 				bestSignalFrequency = SamplingFrequency / fft.Length * peakIndex;
-				bestSignalFft = normalizedFft;
-				bestSignalKurtosis = SpectralKurtosis(fft, minBeatsPerMin, maxBeatsPerMin);
+				bestSignalFft = smoothedFft;
+				
+				bestSignalKurtosis = kurtosis;
 				bestSignalIndex = i;
 			}
 		}
