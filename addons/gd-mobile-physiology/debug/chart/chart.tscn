@@ -1,11 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://bsjbwo2ih2fke"]
+[gd_scene load_steps=3 format=3 uid="uid://bsjbwo2ih2fke"]
 
 [ext_resource type="Script" uid="uid://ddfe0g8jg370l" path="res://addons/gd-mobile-physiology/debug/chart/Chart.gd" id="1_0lcky"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xbdj"]
+bg_color = Color(0.143052, 0.139873, 0.174747, 0.878431)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="Chart" type="PanelContainer"]
 offset_right = 117.0
 offset_bottom = 50.0
 size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_8xbdj")
 script = ExtResource("1_0lcky")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]

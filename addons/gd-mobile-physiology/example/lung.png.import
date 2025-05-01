@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dq3dkr1qmja00"
-path="res://.godot/imported/lung.png-ad848fc032e54b42e5271abcc9fb2af7.ctex"
+path="res://.godot/imported/lung.png-97a3b42a15d71604858e7d01a5a46ec8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gd-mobile-physiology/example/simple_demo/lung.png"
-dest_files=["res://.godot/imported/lung.png-ad848fc032e54b42e5271abcc9fb2af7.ctex"]
+source_file="res://addons/gd-mobile-physiology/example/lung.png"
+dest_files=["res://.godot/imported/lung.png-97a3b42a15d71604858e7d01a5a46ec8.ctex"]
 
 [params]
 

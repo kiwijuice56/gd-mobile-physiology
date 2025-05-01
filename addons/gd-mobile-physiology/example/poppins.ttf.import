@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://crijv0xgmcoyb"
-path="res://.godot/imported/poppins.ttf-99f0efecf16685e8cf528fb332ac66ed.fontdata"
+path="res://.godot/imported/poppins.ttf-62a1b7feed4bacc215c74f1e4f271aa0.fontdata"
 
 [deps]
 
-source_file="res://addons/gd-mobile-physiology/example/simple_demo/poppins.ttf"
-dest_files=["res://.godot/imported/poppins.ttf-99f0efecf16685e8cf528fb332ac66ed.fontdata"]
+source_file="res://addons/gd-mobile-physiology/example/poppins.ttf"
+dest_files=["res://.godot/imported/poppins.ttf-62a1b7feed4bacc215c74f1e4f271aa0.fontdata"]
 
 [params]
 

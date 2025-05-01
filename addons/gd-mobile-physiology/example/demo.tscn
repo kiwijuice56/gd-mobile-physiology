@@ -1,0 +1,549 @@
+[gd_scene load_steps=20 format=3 uid="uid://dsm5pj1lsvevs"]
+
+[ext_resource type="Script" uid="uid://b4scgfsavn7yy" path="res://addons/gd-mobile-physiology/example/Demo.gd" id="1_y735l"]
+[ext_resource type="Script" uid="uid://oyt3o8h3pgxm" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_k31b6"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/debug/chart/chart.tscn" id="3_gbvmf"]
+[ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/poppins.ttf" id="4_0j65r"]
+[ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/heart.png" id="5_pwl8k"]
+[ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/lung.png" id="6_p6vae"]
+
+[sub_resource type="Gradient" id="Gradient_ptoos"]
+interpolation_color_space = 2
+colors = PackedColorArray(0.23301, 0.231848, 0.305833, 1, 0.435533, 0.4324, 0.47, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jygmv"]
+gradient = SubResource("Gradient_ptoos")
+width = 1
+height = 1024
+fill_from = Vector2(0.528455, 1)
+fill_to = Vector2(0.504065, 0)
+
+[sub_resource type="FontFile" id="FontFile_sehcc"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+cache/0/32/0/ascent = 0.0
+cache/0/32/0/descent = 0.0
+cache/0/32/0/underline_position = 0.0
+cache/0/32/0/underline_thickness = 0.0
+cache/0/32/0/scale = 1.0
+cache/0/32/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/32/0/kerning_overrides/20/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/20/0 = Vector2(0, 0)
+cache/0/12/0/ascent = 0.0
+cache/0/12/0/descent = 0.0
+cache/0/12/0/underline_position = 0.0
+cache/0/12/0/underline_thickness = 0.0
+cache/0/12/0/scale = 1.0
+cache/0/12/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/12/0/kerning_overrides/20/0 = Vector2(0, 0)
+cache/0/20/0/ascent = 0.0
+cache/0/20/0/descent = 0.0
+cache/0/20/0/underline_position = 0.0
+cache/0/20/0/underline_thickness = 0.0
+cache/0/20/0/scale = 1.0
+cache/0/20/0/kerning_overrides/32/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/12/0 = Vector2(0, 0)
+cache/0/20/0/kerning_overrides/20/0 = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_0ufry"]
+default_font = SubResource("FontFile_sehcc")
+default_font_size = 32
+
+[sub_resource type="FontVariation" id="FontVariation_tmh1g"]
+base_font = ExtResource("4_0j65r")
+
+[sub_resource type="Theme" id="Theme_3our0"]
+default_font = SubResource("FontVariation_tmh1g")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tk5ej"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.117647, 0.113725, 0.160784, 0.678431)
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qoakl"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.19205, 0.1886, 0.23, 0.878431)
+border_width_bottom = 6
+border_color = Color(0.0761467, 0.0738692, 0.107939, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6mtfg"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(0.117647, 0.113725, 0.160784, 0.678431)
+border_color = Color(0.118187, 0.1152, 0.16, 0.678431)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+anti_aliasing = false
+
+[sub_resource type="ImageTexture" id="ImageTexture_o1y25"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d1u1o"]
+content_margin_top = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.141176, 0.121569, 0.176471, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wslao"]
+content_margin_top = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.87451, 0.87451, 0.87451, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o1y25"]
+content_margin_top = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="Demo" type="Node"]
+script = ExtResource("1_y735l")
+
+[node name="Sampler" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_k31b6")
+
+[node name="Background" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_jygmv")
+expand_mode = 2
+
+[node name="RecordingCover" type="ColorRect" parent="Background"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.61, 0.0732, 0.440013, 0.113725)
+
+[node name="DetailedInterface" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_0ufry")
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DetailedInterface"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="GridContainer" type="GridContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="ChartContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer"]
+layout_mode = 2
+text = "1) Raw Data (x, y, z accelerometer + gyro readings)"
+
+[node name="RawDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="RawDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="RawDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="RawDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="RawDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="RawDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="ChartContainer4" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4"]
+layout_mode = 2
+text = "2) Detrended, Z-Scored, and Filtered Data"
+
+[node name="FixedDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="FixedDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="FixedDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="FixedDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="FixedDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="FixedDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="ChartContainer5" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ICATitle" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5"]
+layout_mode = 2
+text = "3) ICA Output"
+
+[node name="ICA1" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA3" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA4" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.267137, 0.617942, 0.561183, 1)
+
+[node name="ICA5" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ICA6" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="ChartContainer3" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ProbabilityTitle" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "4) Normalized and Smoothed FFT of Best ICA Signal"
+
+[node name="RateLabel" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = " "
+
+[node name="ProbabilityDistribution" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="DetailedInterface/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_3our0")
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="ButtonContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 16
+
+[node name="ShowHeartButton" type="Button" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Show Heart Data"
+
+[node name="ShowBreathingButton" type="Button" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Show Breathing Data"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 32
+
+[node name="Label" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
+layout_mode = 2
+text = "Recording Size (s):"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Min" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "10"
+
+[node name="LengthSlider" type="HSlider" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_icons/grabber = SubResource("ImageTexture_o1y25")
+theme_override_icons/grabber_highlight = SubResource("ImageTexture_o1y25")
+theme_override_icons/grabber_disabled = SubResource("ImageTexture_o1y25")
+theme_override_icons/tick = SubResource("ImageTexture_o1y25")
+theme_override_styles/slider = SubResource("StyleBoxFlat_d1u1o")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_wslao")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_o1y25")
+min_value = 10.0
+max_value = 90.0
+value = 30.0
+
+[node name="Max" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "90"
+
+[node name="BasicInterface" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -163.0
+offset_top = -269.5
+offset_right = 163.0
+offset_bottom = 269.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(163, 254)
+theme = SubResource("Theme_3our0")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="BasicInterface"]
+layout_mode = 2
+theme_override_constants/separation = 64
+dragger_visibility = 2
+
+[node name="DataContainer" type="VBoxContainer" parent="BasicInterface/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_constants/separation = 16
+
+[node name="HeartContainer" type="HBoxContainer" parent="BasicInterface/VSplitContainer/DataContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeartIcon" type="TextureRect" parent="BasicInterface/VSplitContainer/DataContainer/HeartContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("5_pwl8k")
+stretch_mode = 2
+
+[node name="HRLabel" type="Label" parent="BasicInterface/VSplitContainer/DataContainer/HeartContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 128
+text = "-"
+
+[node name="BreathingContainer" type="HBoxContainer" parent="BasicInterface/VSplitContainer/DataContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LungIcon" type="TextureRect" parent="BasicInterface/VSplitContainer/DataContainer/BreathingContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("6_p6vae")
+stretch_mode = 2
+
+[node name="BRLabel" type="Label" parent="BasicInterface/VSplitContainer/DataContainer/BreathingContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 128
+text = "-"
+
+[node name="BPM" type="Label" parent="BasicInterface/VSplitContainer/DataContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 24
+text = "(bpm)"
+
+[node name="InputContainer" type="VBoxContainer" parent="BasicInterface/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+theme_override_constants/separation = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BasicInterface/VSplitContainer/InputContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="RecordButton" type="Button" parent="BasicInterface/VSplitContainer/InputContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Start measuring"
+
+[node name="ProgressBar" type="ProgressBar" parent="BasicInterface/VSplitContainer/InputContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+max_value = 1.0
+step = 0.001
+show_percentage = false
+
+[node name="ToggleContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_3our0")
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ToggleButton" type="Button" parent="ToggleContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 10
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Toggle Details"
