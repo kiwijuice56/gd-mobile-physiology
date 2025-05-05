@@ -306,6 +306,20 @@ public partial class SignalHelper : RefCounted {
 		return (bestSignalFrequency, maxStrength, bestSignalKurtosis, bestSignalFft, bestSignalIndex);
 	}
 	
+	// Approximates the first-order derivative of a signal
+	// https://tang.eece.wustl.edu/Kirk/Chapter19rev2Dolan.pdf
+	public static double[] Derivative(double[] signal) {
+		// Window size is 5
+		double[] result = new double[signal.Length - 4];
+		for (int i = 2; i < signal.Length - 2; i++) {
+			double a = -1 * signal[i + 2];
+			double b = +8 * signal[i + 1];
+			double c = -8 * signal[i - 1];
+			double d = +1 * signal[i - 2];
+			result[i - 2] = (a + b + c + d) / 12;
+		}
+		return result;
+	}
 	
 	// Calculates heart/breathing rate (in the range [`minBeatsPerMin`, `maxBeatsPerMin`]) from the 
 	// vibrations of a person holding a mobile device using the accelerometer and gyroscope, 
@@ -334,25 +348,9 @@ public partial class SignalHelper : RefCounted {
 		
 		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{}; 
 		
-		int sampleSize = accel.Count;
-		if (accel.Count != gyro.Count) {
-			throw new ArgumentException("Must have the same amount of gyroscope and accelerometer samples.");
-		}
-		
 		// Load gyro/accel data into a 2D matrix
-		double[][] signals = new double[6][];
-		for (int i = 0; i < 6; i++) {
-			signals[i] = new double[sampleSize];
-		}
-		
-		for (int i = 0; i < sampleSize; i++) {
-			signals[0][i] = accel[i].X;
-			signals[1][i] = accel[i].Y;
-			signals[2][i] = accel[i].Z;
-			signals[3][i] = gyro[i].X;
-			signals[4][i] = gyro[i].Y;
-			signals[5][i] = gyro[i].Z;
-		}
+		int sampleSize = accel.Count;
+		double[][] signals = GodotVectorsToMatrix(accel, gyro);
 		
 		// Check if gyroscope is completely 0 (can cause NaN propagation later);
 		
@@ -420,5 +418,30 @@ public partial class SignalHelper : RefCounted {
 		}
 		
 		return output;
+	}
+	
+	// Converts an array of accelerometer/gyroscope samples to a matrix
+	public static double[][] GodotVectorsToMatrix(Godot.Collections.Array<Godot.Vector3> accel, Godot.Collections.Array<Godot.Vector3> gyro) {
+		int sampleSize = accel.Count;
+		if (accel.Count != gyro.Count) {
+			throw new ArgumentException("Must have the same amount of gyroscope and accelerometer samples.");
+		}
+		
+		// Load gyro/accel data into a 2D matrix
+		double[][] signals = new double[6][];
+		for (int i = 0; i < 6; i++) {
+			signals[i] = new double[sampleSize];
+		}
+		
+		for (int i = 0; i < sampleSize; i++) {
+			signals[0][i] = accel[i].X;
+			signals[1][i] = accel[i].Y;
+			signals[2][i] = accel[i].Z;
+			signals[3][i] = gyro[i].X;
+			signals[4][i] = gyro[i].Y;
+			signals[5][i] = gyro[i].Z;
+		}
+		
+		return signals;
 	}
 }

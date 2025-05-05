@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=21 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" uid="uid://b4scgfsavn7yy" path="res://addons/gd-mobile-physiology/example/Demo.gd" id="1_y735l"]
 [ext_resource type="Script" uid="uid://oyt3o8h3pgxm" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_k31b6"]
@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/poppins.ttf" id="4_0j65r"]
 [ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/heart.png" id="5_pwl8k"]
 [ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/lung.png" id="6_p6vae"]
+[ext_resource type="Texture2D" uid="uid://cjf1af5gc7ibi" path="res://addons/gd-mobile-physiology/example/wiggle.png" id="7_d1u1o"]
 
 [sub_resource type="Gradient" id="Gradient_ptoos"]
 interpolation_color_space = 2
@@ -193,143 +194,213 @@ theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 2
 
-[node name="ChartContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="RawContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer"]
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer"]
 layout_mode = 2
 text = "1) Raw Data (x, y, z accelerometer + gyro readings)"
 
-[node name="RawDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="RawDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="RawDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="RawDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="RawDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="RawDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer" instance=ExtResource("3_gbvmf")]
+[node name="RawDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="ChartContainer4" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="ProcessedContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4"]
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer"]
 layout_mode = 2
 text = "2) Detrended, Z-Scored, and Filtered Data"
 
-[node name="FixedDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="FixedDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="FixedDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="FixedDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
-[node name="FixedDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
-[node name="FixedDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer4" instance=ExtResource("3_gbvmf")]
+[node name="FixedDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProcessedContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
-[node name="ChartContainer5" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="IcaContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ICATitle" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5"]
+[node name="ICATitle" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer"]
 layout_mode = 2
 text = "3) ICA Output"
 
-[node name="ICA1" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA1" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA3" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA3" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA4" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA4" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.267137, 0.617942, 0.561183, 1)
 
-[node name="ICA5" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA5" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ICA6" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer5" instance=ExtResource("3_gbvmf")]
+[node name="ICA6" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/IcaContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
-[node name="ChartContainer3" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="ProbabilityContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ProbabilityTitle" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProbabilityContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "4) Normalized and Smoothed FFT of Best ICA Signal"
 
-[node name="RateLabel" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3"]
+[node name="RateLabel" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProbabilityContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = " "
 
-[node name="ProbabilityDistribution" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ChartContainer3" instance=ExtResource("3_gbvmf")]
+[node name="ProbabilityDistribution" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/ProbabilityContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.266667, 0.619608, 0.560784, 1)
+
+[node name="DerivativeContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer"]
+layout_mode = 2
+text = "2) Derivative Of All Signals"
+
+[node name="DerivativeDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="DerivativeDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="DerivativeDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="DerivativeDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="DerivativeDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="DerivativeDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
+[node name="TotalWiggleContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/TotalWiggleContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "3) Total Wiggle Signal"
+
+[node name="IndexLabel" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/TotalWiggleContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = " Wiggle index: "
+
+[node name="WiggleData" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/TotalWiggleContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
@@ -346,11 +417,11 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="ShowHeartButton" type="Button" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(128, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
@@ -360,11 +431,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
 theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
-text = "Show Heart Data"
+text = "Show HR"
 
 [node name="ShowBreathingButton" type="Button" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(128, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
@@ -374,7 +445,21 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
 theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
-text = "Show Breathing Data"
+text = "Show BR"
+
+[node name="ShowWiggleButton" type="Button" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tk5ej")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
+text = "Show WI"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer"]
 layout_mode = 2
@@ -383,7 +468,7 @@ theme_override_constants/separation = 32
 
 [node name="Label" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
 layout_mode = 2
-text = "Recording Size (s):"
+text = "Recording Length (s):"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
 layout_mode = 2
@@ -439,7 +524,7 @@ dragger_visibility = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
-theme_override_constants/separation = 16
+theme_override_constants/separation = -4
 
 [node name="HeartContainer" type="HBoxContainer" parent="BasicInterface/VSplitContainer/DataContainer"]
 layout_mode = 2
@@ -480,12 +565,33 @@ theme_override_font_sizes/font_size = 128
 text = "-"
 
 [node name="BPM" type="Label" parent="BasicInterface/VSplitContainer/DataContainer"]
+visible = false
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 24
 text = "(bpm)"
+
+[node name="WiggleContainer" type="HBoxContainer" parent="BasicInterface/VSplitContainer/DataContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="WiggleIcon" type="TextureRect" parent="BasicInterface/VSplitContainer/DataContainer/WiggleContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("7_d1u1o")
+stretch_mode = 2
+
+[node name="WILabel" type="Label" parent="BasicInterface/VSplitContainer/DataContainer/WiggleContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 128
+text = "-"
 
 [node name="InputContainer" type="VBoxContainer" parent="BasicInterface/VSplitContainer"]
 layout_mode = 2
@@ -495,7 +601,7 @@ theme_override_constants/separation = 32
 
 [node name="VBoxContainer" type="VBoxContainer" parent="BasicInterface/VSplitContainer/InputContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 8
 
 [node name="RecordButton" type="Button" parent="BasicInterface/VSplitContainer/InputContainer/VBoxContainer"]
 unique_name_in_owner = true
