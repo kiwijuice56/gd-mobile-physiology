@@ -310,13 +310,12 @@ public partial class SignalHelper : RefCounted {
 	// https://tang.eece.wustl.edu/Kirk/Chapter19rev2Dolan.pdf
 	public static double[] Derivative(double[] signal) {
 		// Window size is 5
-		double[] result = new double[signal.Length - 4];
-		for (int i = 2; i < signal.Length - 2; i++) {
-			double a = -1 * signal[i + 2];
-			double b = +8 * signal[i + 1];
-			double c = -8 * signal[i - 1];
-			double d = +1 * signal[i - 2];
-			result[i - 2] = (a + b + c + d) / 12;
+		double[] result = new double[signal.Length - 2];
+		for (int i = 2; i < signal.Length; i++) {
+			double a = +1 * signal[i - 2];
+			double b = -4 * signal[i - 1];
+			double c = +3 * signal[i - 0];
+			result[i - 2] = (a + b + c) / 2;
 		}
 		return result;
 	}

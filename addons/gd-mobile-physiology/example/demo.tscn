@@ -367,16 +367,19 @@ line_color = Color(0.156863, 0.368627, 0.788235, 1)
 
 [node name="DerivativeDataX2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 line_color = Color(0.74902, 0.188235, 0.356863, 1)
 
 [node name="DerivativeDataY2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 line_color = Color(0.25098, 0.670588, 0.215686, 1)
 
 [node name="DerivativeDataZ2" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 line_color = Color(0.156863, 0.368627, 0.788235, 1)
 

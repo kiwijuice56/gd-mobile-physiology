@@ -67,7 +67,7 @@ func _on_record() -> void:
 	
 	heart_data = HeartRateAlgorithm.Analyze(accelerometer.slice(0, heart_sample_size), gyroscope.slice(0, heart_sample_size), true)
 	breathing_data = BreathingRateAlgorithm.Analyze(accelerometer.slice(0, breath_sample_size), gyroscope.slice(0, breath_sample_size), true)
-	wiggle_data = WiggleIndexAlgorithm.Analyze(accelerometer, gyroscope, true)
+	wiggle_data = WiggleIndexAlgorithm.Analyze(accelerometer, true)
 	
 	%HRLabel.text = str(int(heart_data["rate"]))
 	%BRLabel.text = str(int(breathing_data["rate"]))
@@ -115,12 +115,20 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		%ProbabilityContainer.visible = false
 		%TotalWiggleContainer.visible = true
 		%DerivativeContainer.visible = true
+		
+		%RawDataX2.visible = false
+		%RawDataY2.visible = false
+		%RawDataZ2.visible = false
 	else:
 		%ProcessedContainer.visible = true
 		%IcaContainer.visible = true
 		%ProbabilityContainer.visible = true
 		%TotalWiggleContainer.visible = false
 		%DerivativeContainer.visible = false
+		
+		%RawDataX2.visible = true
+		%RawDataY2.visible = true
+		%RawDataZ2.visible = true
 	
 	# Skip plotting if there is no data
 	if debug_info.size() == 0:
@@ -138,9 +146,6 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
 	%RawDataZ.plot(debug_info["RawAccelZ"])
-	%RawDataX2.plot(debug_info["RawGyroX"])
-	%RawDataY2.plot(debug_info["RawGyroY"])
-	%RawDataZ2.plot(debug_info["RawGyroZ"])
 	
 	if shown_measurement == Measurement.Wiggle:
 		%ProcessedContainer.visible = false
@@ -151,15 +156,21 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		%DerivativeDataX.plot(debug_info["DerivativeAccelX"])
 		%DerivativeDataY.plot(debug_info["DerivativeAccelY"])
 		%DerivativeDataZ.plot(debug_info["DerivativeAccelZ"])
-		%DerivativeDataX2.plot(debug_info["DerivativeGyroX"])
-		%DerivativeDataY2.plot(debug_info["DerivativeGyroY"])
-		%DerivativeDataZ2.plot(debug_info["DerivativeGyroZ"])	
+		
+		# %DerivativeDataX2.plot(debug_info["DerivativeGyroX"])
+		# %DerivativeDataY2.plot(debug_info["DerivativeGyroY"])
+		# %DerivativeDataZ2.plot(debug_info["DerivativeGyroZ"])	
+		
 		%WiggleData.plot(debug_info["WiggleTotal"])
 	else:
 		%ProcessedContainer.visible = true
 		%IcaContainer.visible = true
 		%ProbabilityContainer.visible = true
 		%TotalWiggleContainer.visible = false
+		
+		%RawDataX2.plot(debug_info["RawGyroX"])
+		%RawDataY2.plot(debug_info["RawGyroY"])
+		%RawDataZ2.plot(debug_info["RawGyroZ"])
 		
 		%FixedDataX.plot(debug_info["PreprocessedAccelX"])
 		%FixedDataY.plot(debug_info["PreprocessedAccelY"])
