@@ -1,9 +1,15 @@
 # gd-mobile-physiology
 
 A library that processes smartphone data into physiological signals, such as heart and breathing rate.
+Also includes wobble measurement to detect brain trauma.
+
+The intended usage is to record data by holding the device up to your chest. Good readings
+require about 15-30 seconds of recording. The wobble recording should be done standing up.
+
+Requires Godot 4.4.stable.mono or later.
 
 ## Installation
-Note: This project requires the Mono version of Godot (last tested on version `4.3.stable.mono`).
+Note: This project requires the Mono version of Godot.
 1) Copy the `addons/gd-mobile-physiology/` folder into your project's `addons` folder.
 2) Include the `Accord.NET` dependency in your build settings:
 	- (If your project DOES NOT have a `.csproj` file): Copy the `heart-rate-sensor.csproj` and `heart-rate-sensor.sln` files from the download folder
@@ -18,6 +24,7 @@ into the root of your project. Update `dotnet/project/assembly_name` in Project 
 3) Enable the plugin in Project Settings.
 
 ## Usage
+### Heart and breathing
 To estimate heart/respiration rate, you must pass an `Array[Vector3]` of accelerometer samples and an `Array[Vector3]` of gyroscope samples into the static `Analyze` function of
 `HeartRateAlgorithm` or `RespirationRateAlgorithm`.
 
@@ -36,8 +43,11 @@ with the amount of real samples you want. Higher sample sizes increase the accur
 The `debugOutput` parameter will enable logging of intermediate signals during analysis, which may be useful to see where the algorithm is going wrong.
 These debug values are returned in the output dictionary.
 
-## Example Script
-See `addons/gd-mobile-physiology/example/Main.gd` for the full example script.
+### Wobble/wiggle index
+The `WiggleIndexAlgorithm` is similar to the previous two algorithms, but only requires accelerometer samples.
+
+## Example 
+See `addons/gd-mobile-physiology/example/Demo.gd` for the full example script. 
 
 ```python
 func test_heart_rate(sample_size: int) -> void:
