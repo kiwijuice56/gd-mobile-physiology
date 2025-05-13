@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://conoblevf2weo"
-path="res://.godot/imported/heart.png-dfbb069c716606b57d6af18618ce0cf2.ctex"
+uid="uid://cjf1af5gc7ibi"
+path="res://.godot/imported/wiggle.png-4983b9c530bc97dd4d638b36e6f54857.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gd-mobile-physiology/example/heart.png"
-dest_files=["res://.godot/imported/heart.png-dfbb069c716606b57d6af18618ce0cf2.ctex"]
+source_file="res://addons/gd-mobile-physiology/example/image/wiggle.png"
+dest_files=["res://.godot/imported/wiggle.png-4983b9c530bc97dd4d638b36e6f54857.ctex"]
 
 [params]
 

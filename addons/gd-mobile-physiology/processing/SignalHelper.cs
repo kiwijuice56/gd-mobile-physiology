@@ -308,14 +308,14 @@ public partial class SignalHelper : RefCounted {
 	
 	// Approximates the first-order derivative of a signal
 	// https://tang.eece.wustl.edu/Kirk/Chapter19rev2Dolan.pdf
-	public static double[] Derivative(double[] signal) {
+	public static double[] Derivative(double[] signal, int skipSamples) {
 		// Window size is 5
-		double[] result = new double[signal.Length - 2];
-		for (int i = 2; i < signal.Length; i++) {
+		double[] result = new double[signal.Length - 2 - skipSamples];
+		for (int i = 2 + skipSamples; i < signal.Length; i++) {
 			double a = +1 * signal[i - 2];
 			double b = -4 * signal[i - 1];
 			double c = +3 * signal[i - 0];
-			result[i - 2] = (a + b + c) / 2;
+			result[i - 2 - skipSamples] = (a + b + c) / 2;
 		}
 		return result;
 	}

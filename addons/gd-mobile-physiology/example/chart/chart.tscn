@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bsjbwo2ih2fke"]
 
-[ext_resource type="Script" uid="uid://ddfe0g8jg370l" path="res://addons/gd-mobile-physiology/debug/chart/Chart.gd" id="1_0lcky"]
+[ext_resource type="Script" uid="uid://ddfe0g8jg370l" path="res://addons/gd-mobile-physiology/example/chart/Chart.gd" id="1_0lcky"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xbdj"]
 bg_color = Color(0.143052, 0.139873, 0.174747, 0.878431)

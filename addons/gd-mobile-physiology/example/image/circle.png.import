@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjf1af5gc7ibi"
-path="res://.godot/imported/wiggle.png-9ebfc6d8b8dc738a7c9b374ae7bcfa2b.ctex"
+uid="uid://cydfqpbflan5x"
+path="res://.godot/imported/circle.png-3b03c7e50dd996c5861735d88d026238.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gd-mobile-physiology/example/wiggle.png"
-dest_files=["res://.godot/imported/wiggle.png-9ebfc6d8b8dc738a7c9b374ae7bcfa2b.ctex"]
+source_file="res://addons/gd-mobile-physiology/example/image/circle.png"
+dest_files=["res://.godot/imported/circle.png-3b03c7e50dd996c5861735d88d026238.ctex"]
 
 [params]
 

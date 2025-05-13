@@ -34,12 +34,15 @@ func _ready() -> void:
 
 func _on_length_changed(value: float) -> void:
 	sample_size = int(value * 60)
+	%TimeLabel.text = str(int(value))
 
 func _on_toggle() -> void:
 	showing_detailed = not showing_detailed
 	show_interface()
 
 func _on_record() -> void:
+	%StartPlayer.play()
+	
 	get_tree().create_tween().tween_property(%RecordingCover, "modulate:a", 1.0, 1.0)
 	
 	%RecordButton.disabled = true
@@ -87,6 +90,9 @@ func _on_record() -> void:
 	%LengthSlider.editable = true
 	
 	get_tree().create_tween().tween_property(%RecordingCover, "modulate:a", 0.0, 0.5)
+	
+	Input.vibrate_handheld(1000, 0.5)
+	%EndPlayer.play()
 
 func _on_pressed_heart() -> void:
 	shown_measurement = Measurement.Heart
@@ -115,6 +121,7 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		%ProbabilityContainer.visible = false
 		%TotalWiggleContainer.visible = true
 		%DerivativeContainer.visible = true
+		%SmoothedContainer.visible = true
 		
 		%RawDataX2.visible = false
 		%RawDataY2.visible = false
@@ -125,6 +132,7 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		%ProbabilityContainer.visible = true
 		%TotalWiggleContainer.visible = false
 		%DerivativeContainer.visible = false
+		%SmoothedContainer.visible = false
 		
 		%RawDataX2.visible = true
 		%RawDataY2.visible = true
@@ -141,7 +149,7 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		Measurement.Breathing:
 			%RateLabel.text = "Breathing Rate (bpm): %.2f, Confidence: %.2f, Kurtosis: %.2f" % [breathing_data["rate"], breathing_data["confidence"], breathing_data["kurtosis"]]
 		Measurement.Wiggle:
-			%IndexLabel.text = "Wiggle Index: %.4f" % [wiggle_data["wiggle"]]
+			%IndexLabel.text = "Wobble Index: %.4f" % [wiggle_data["wiggle"]]
 	
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
@@ -157,9 +165,9 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		%DerivativeDataY.plot(debug_info["DerivativeAccelY"])
 		%DerivativeDataZ.plot(debug_info["DerivativeAccelZ"])
 		
-		# %DerivativeDataX2.plot(debug_info["DerivativeGyroX"])
-		# %DerivativeDataY2.plot(debug_info["DerivativeGyroY"])
-		# %DerivativeDataZ2.plot(debug_info["DerivativeGyroZ"])	
+		%SmoothDataX.plot(debug_info["SmoothedX"])
+		%SmoothDataY.plot(debug_info["SmoothedY"])
+		%SmoothDataZ.plot(debug_info["SmoothedZ"])
 		
 		%WiggleData.plot(debug_info["WiggleTotal"])
 	else:

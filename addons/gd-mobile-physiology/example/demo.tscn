@@ -1,12 +1,16 @@
-[gd_scene load_steps=21 format=3 uid="uid://dsm5pj1lsvevs"]
+[gd_scene load_steps=23 format=3 uid="uid://dsm5pj1lsvevs"]
 
 [ext_resource type="Script" uid="uid://b4scgfsavn7yy" path="res://addons/gd-mobile-physiology/example/Demo.gd" id="1_y735l"]
 [ext_resource type="Script" uid="uid://oyt3o8h3pgxm" path="res://addons/gd-mobile-physiology/sampling/Sampler.gd" id="2_k31b6"]
-[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/debug/chart/chart.tscn" id="3_gbvmf"]
-[ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/poppins.ttf" id="4_0j65r"]
-[ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/heart.png" id="5_pwl8k"]
-[ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/lung.png" id="6_p6vae"]
-[ext_resource type="Texture2D" uid="uid://cjf1af5gc7ibi" path="res://addons/gd-mobile-physiology/example/wiggle.png" id="7_d1u1o"]
+[ext_resource type="PackedScene" uid="uid://bsjbwo2ih2fke" path="res://addons/gd-mobile-physiology/example/chart/chart.tscn" id="3_gbvmf"]
+[ext_resource type="FontFile" uid="uid://crijv0xgmcoyb" path="res://addons/gd-mobile-physiology/example/font/poppins.ttf" id="4_0j65r"]
+[ext_resource type="Texture2D" uid="uid://cydfqpbflan5x" path="res://addons/gd-mobile-physiology/example/image/circle.png" id="5_jli7i"]
+[ext_resource type="Texture2D" uid="uid://conoblevf2weo" path="res://addons/gd-mobile-physiology/example/image/heart.png" id="5_pwl8k"]
+[ext_resource type="Texture2D" uid="uid://bugcoq4a0unua" path="res://addons/gd-mobile-physiology/example/image/tick.png" id="5_wslao"]
+[ext_resource type="Texture2D" uid="uid://dq3dkr1qmja00" path="res://addons/gd-mobile-physiology/example/image/lung.png" id="6_p6vae"]
+[ext_resource type="Texture2D" uid="uid://cjf1af5gc7ibi" path="res://addons/gd-mobile-physiology/example/image/wiggle.png" id="7_d1u1o"]
+[ext_resource type="AudioStream" uid="uid://dp0cuxj7f2h3x" path="res://addons/gd-mobile-physiology/example/sound/start.ogg" id="10_hqawx"]
+[ext_resource type="AudioStream" uid="uid://dw4aad5okkn53" path="res://addons/gd-mobile-physiology/example/sound/end.ogg" id="11_d7tgp"]
 
 [sub_resource type="Gradient" id="Gradient_ptoos"]
 interpolation_color_space = 2
@@ -110,34 +114,22 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 anti_aliasing = false
 
-[sub_resource type="ImageTexture" id="ImageTexture_o1y25"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d1u1o"]
-content_margin_top = 16.0
-content_margin_bottom = 16.0
+content_margin_bottom = 48.0
 bg_color = Color(0.141176, 0.121569, 0.176471, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wslao"]
-content_margin_top = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(0.87451, 0.87451, 0.87451, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o1y25"]
-content_margin_top = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.89, 0.89, 0.89, 0.584314)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="Demo" type="Node"]
 script = ExtResource("1_y735l")
@@ -202,7 +194,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer"]
 layout_mode = 2
-text = "1) Raw Data (x, y, z accelerometer + gyro readings)"
+text = "1) Raw Data (x, y, z accelerometer and/or gyroscope)"
 
 [node name="RawDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/RawContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
@@ -339,6 +331,32 @@ unique_name_in_owner = true
 layout_mode = 2
 line_color = Color(0.266667, 0.619608, 0.560784, 1)
 
+[node name="SmoothedContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/SmoothedContainer"]
+layout_mode = 2
+text = "2) Smoothed Data (x, y, z accelerometer)"
+
+[node name="SmoothDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/SmoothedContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.74902, 0.188235, 0.356863, 1)
+
+[node name="SmoothDataY" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/SmoothedContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.25098, 0.670588, 0.215686, 1)
+
+[node name="SmoothDataZ" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/SmoothedContainer" instance=ExtResource("3_gbvmf")]
+unique_name_in_owner = true
+layout_mode = 2
+line_color = Color(0.156863, 0.368627, 0.788235, 1)
+
 [node name="DerivativeContainer" type="VBoxContainer" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer"]
 unique_name_in_owner = true
 visible = false
@@ -348,7 +366,7 @@ size_flags_vertical = 3
 
 [node name="Title" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer"]
 layout_mode = 2
-text = "2) Derivative Of All Signals"
+text = "3) Derivative Of Smoothed Signals"
 
 [node name="DerivativeDataX" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/DerivativeContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
@@ -394,14 +412,14 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-text = "3) Total Wiggle Signal"
+text = "4) Total Wobble Signal"
 
 [node name="IndexLabel" type="Label" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/TotalWiggleContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-text = " Wiggle index: "
+text = " Wobble index: "
 
 [node name="WiggleData" parent="DetailedInterface/VBoxContainer/HBoxContainer/GridContainer/TotalWiggleContainer" instance=ExtResource("3_gbvmf")]
 unique_name_in_owner = true
@@ -471,36 +489,37 @@ theme_override_constants/separation = 32
 
 [node name="Label" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
 layout_mode = 2
-text = "Recording Length (s):"
+text = "Recording Time (s):"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Min" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "10"
-
 [node name="LengthSlider" type="HSlider" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(256, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
-theme_override_icons/grabber = SubResource("ImageTexture_o1y25")
-theme_override_icons/grabber_highlight = SubResource("ImageTexture_o1y25")
-theme_override_icons/grabber_disabled = SubResource("ImageTexture_o1y25")
-theme_override_icons/tick = SubResource("ImageTexture_o1y25")
+theme_override_icons/grabber = ExtResource("5_jli7i")
+theme_override_icons/grabber_highlight = ExtResource("5_jli7i")
+theme_override_icons/grabber_disabled = ExtResource("5_jli7i")
+theme_override_icons/tick = ExtResource("5_wslao")
 theme_override_styles/slider = SubResource("StyleBoxFlat_d1u1o")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_wslao")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_o1y25")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_wslao")
 min_value = 10.0
 max_value = 90.0
+step = 10.0
 value = 30.0
+tick_count = 9
+ticks_on_borders = true
 
-[node name="Max" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
+[node name="TimeLabel" type="Label" parent="DetailedInterface/VBoxContainer/MarginContainer/ButtonContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
-text = "90"
+text = "30"
 
 [node name="BasicInterface" type="MarginContainer" parent="."]
 unique_name_in_owner = true
@@ -656,3 +675,11 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_qoakl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6mtfg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_qoakl")
 text = "Toggle Details"
+
+[node name="StartPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("10_hqawx")
+
+[node name="EndPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("11_d7tgp")

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dq3dkr1qmja00"
-path="res://.godot/imported/lung.png-97a3b42a15d71604858e7d01a5a46ec8.ctex"
+uid="uid://bugcoq4a0unua"
+path="res://.godot/imported/tick.png-f85daed39cb1eeaabb898d395022231b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gd-mobile-physiology/example/lung.png"
-dest_files=["res://.godot/imported/lung.png-97a3b42a15d71604858e7d01a5a46ec8.ctex"]
+source_file="res://addons/gd-mobile-physiology/example/image/tick.png"
+dest_files=["res://.godot/imported/tick.png-f85daed39cb1eeaabb898d395022231b.ctex"]
 
 [params]
 

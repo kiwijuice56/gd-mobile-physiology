@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 [GlobalClass]
 public partial class WiggleIndexAlgorithm : GodotObject {
 	
+	const int smoothWindowSize = 16;
+	
 	public static Godot.Collections.Dictionary Analyze(Godot.Collections.Array<Vector3> accel, bool debugOutput) {
 		Godot.Collections.Dictionary output = new Godot.Collections.Dictionary{}; 
 		
@@ -31,10 +33,22 @@ public partial class WiggleIndexAlgorithm : GodotObject {
 			output["RawAccelZ"] = new Godot.Collections.Array<double>(signals[2]);
 		}
 		
-		// Get first order derivatives
-		double[][] derivatives = new double[6][];
+		// Smooth all signals
+		double[][] smoothedSignals = new double[signalCount][];
 		for (int i = 0; i < signalCount; i++) {
-			derivatives[i] = SignalHelper.Derivative(signals[i]);
+			smoothedSignals[i] = SignalHelper.Smooth(signals[i], smoothWindowSize);
+		}
+		
+		if (debugOutput) {
+			output["SmoothedX"] = new Godot.Collections.Array<double>(smoothedSignals[0]).Slice(smoothWindowSize);
+			output["SmoothedY"] = new Godot.Collections.Array<double>(smoothedSignals[1]).Slice(smoothWindowSize);
+			output["SmoothedZ"] = new Godot.Collections.Array<double>(smoothedSignals[2]).Slice(smoothWindowSize);
+		}
+		
+		// Find first-order derivative
+		double[][] derivatives = new double[signalCount][];
+		for (int i = 0; i < signalCount; i++) {
+			derivatives[i] = SignalHelper.Derivative(smoothedSignals[i], smoothWindowSize);
 		}
 		
 		if (debugOutput) {
