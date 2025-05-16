@@ -57,24 +57,47 @@ public partial class WiggleIndexAlgorithm : GodotObject {
 			output["DerivativeAccelZ"] = new Godot.Collections.Array<double>(derivatives[2]);
 		}
 		
-		double wiggleSum = 0;
 		
+		double[] derivativeMeans = new double[signalCount];
+		for (int j = 0; j < derivatives[0].Length; j++) {
+			for (int i = 0; i < signalCount; i++) {
+				derivativeMeans[i] += Math.Abs(derivatives[i][j]);
+			}
+		}
+		for (int i = 0; i < signalCount; i++) {
+			derivativeMeans[i] /= derivatives[0].Length;
+		}
+		
+		double[] standardDeviations = new double[signalCount];
+		for (int j = 0; j < derivatives[0].Length; j++) {
+			for (int i = 0; i < signalCount; i++) {
+				standardDeviations[i] += Math.Pow(Math.Abs(derivatives[i][j]) - derivativeMeans[i], 2);
+			}
+		}
+		double standardDeviationSum = 0;
+		for (int i = 0; i < signalCount; i++) {
+			standardDeviations[i] /= Math.Sqrt(standardDeviations[i] / derivatives[0].Length);
+			standardDeviationSum += standardDeviations[i];
+		}
+		
+		double wiggleSum = 0;
 		double[] totalWiggle = new double[derivatives[0].Length];
 		for (int j = 0; j < derivatives[0].Length; j++) {
-			double timeWiggle = 0.0;
+			double wiggleInInstant = 0.0;
 			for (int i = 0; i < signalCount; i++) {
-				timeWiggle += Math.Abs(derivatives[i][j]);
+				wiggleInInstant += Math.Abs(derivatives[i][j]);
 			}
-			totalWiggle[j] = timeWiggle;
-			wiggleSum += timeWiggle;
+			totalWiggle[j] = wiggleInInstant;
+			wiggleSum += wiggleInInstant;
 		}
-		wiggleSum /= derivatives[0].Length;
+		double meanWigglePerInstant = wiggleSum / derivatives[0].Length;
 		
 		if (debugOutput) {
 			output["WiggleTotal"] = new Godot.Collections.Array<double>(totalWiggle);
 		}
 		
-		output["wiggle"] = wiggleSum;
+		output["wiggle"] = 100 * meanWigglePerInstant;
+		output["stdev"] = standardDeviationSum;
 		
 		return output;
 	}

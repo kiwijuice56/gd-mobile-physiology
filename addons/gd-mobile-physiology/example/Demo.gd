@@ -41,11 +41,16 @@ func _on_toggle() -> void:
 	show_interface()
 
 func _on_record() -> void:
+	%RecordButton.disabled = true
+	
+	for delay in range(5, 0, -1):
+		%RecordButton.text = "Starting in %d..." % [delay]
+		await get_tree().create_timer(1.0).timeout
+	
 	%StartPlayer.play()
 	
 	get_tree().create_tween().tween_property(%RecordingCover, "modulate:a", 1.0, 1.0)
 	
-	%RecordButton.disabled = true
 	%RecordButton.text = "Collecting data..."
 	%LengthSlider.editable = false
 	
@@ -149,7 +154,7 @@ func plot_debug_info(debug_info: Dictionary) -> void:
 		Measurement.Breathing:
 			%RateLabel.text = "Breathing Rate (bpm): %.2f, Confidence: %.2f, Kurtosis: %.2f" % [breathing_data["rate"], breathing_data["confidence"], breathing_data["kurtosis"]]
 		Measurement.Wiggle:
-			%IndexLabel.text = "Wobble Index: %.4f" % [wiggle_data["wiggle"]]
+			%IndexLabel.text = "Wobble Index: %.4f, Stdev Sum: %.4f" % [wiggle_data["wiggle"], wiggle_data["stdev"]]
 	
 	%RawDataX.plot(debug_info["RawAccelX"])
 	%RawDataY.plot(debug_info["RawAccelY"])
